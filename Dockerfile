@@ -67,6 +67,8 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
 COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+# Зависимости Prisma CLI (нужны для prisma migrate deploy)
+COPY --from=builder /app/node_modules/valibot ./node_modules/valibot
 
 # Копируем entrypoint скрипт
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
