@@ -61,14 +61,14 @@ RUN chown -R nextjs:nodejs ./public/uploads
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Копируем Prisma для миграций
+# Копируем все node_modules (включая Prisma CLI и все его зависимости)
+COPY --from=deps /app/node_modules ./node_modules
+# Поверх кладём сгенерированный Prisma Client из builder
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+
+# Копируем Prisma schema и миграции
 COPY --from=builder /app/prisma ./prisma
 COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
-# Зависимости Prisma CLI (нужны для prisma migrate deploy)
-COPY --from=builder /app/node_modules/valibot ./node_modules/valibot
 
 # Копируем entrypoint скрипт
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
