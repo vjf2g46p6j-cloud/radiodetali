@@ -16,3 +16,6 @@ export { ReviewSubmitModal } from "./ReviewSubmitModal";
 export { ReviewsSection } from "./ReviewsSection";
 export { ReviewsCarousel } from "./ReviewsCarousel";
 export type { ReviewDisplay } from "./ReviewsCarousel";
+export { CategoryBanner } from "./CategoryBanner";
+export { ProductMetalContent } from "./ProductMetalContent";
+export { ProductDetailView } from "./ProductDetailView";

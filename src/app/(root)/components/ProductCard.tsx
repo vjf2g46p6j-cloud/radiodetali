@@ -214,13 +214,6 @@ export function ProductCard({ product, categorySlug, categoryName, variant = "de
           </h3>
         </Link>
 
-        {/* Description */}
-        {product.description && (
-          <p className="text-sm font-medium text-[var(--gray-900)] mb-5 line-clamp-2">
-            {product.description}
-          </p>
-        )}
-
         {/* Prices */}
         <div className="mb-3">
           {/* Цена по запросу */}

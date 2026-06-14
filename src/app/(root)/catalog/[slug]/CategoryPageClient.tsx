@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ChevronRight, Package, ArrowLeft, AlertTriangle } from "lucide-react";
 import { ProductCardCompact } from "../../components";
+import { CategoryBanner } from "../../components/CategoryBanner";
 import type { ProductWithPrice } from "@/app/actions";
 
 interface CategoryPageClientProps {
@@ -16,9 +17,17 @@ interface CategoryPageClientProps {
   };
   products: ProductWithPrice[];
   total: number;
+  showBoardBanner: boolean;
+  showGuideBanner: boolean;
 }
 
-export function CategoryPageClient({ category, products, total }: CategoryPageClientProps) {
+export function CategoryPageClient({
+  category,
+  products,
+  total,
+  showBoardBanner,
+  showGuideBanner,
+}: CategoryPageClientProps) {
   const searchParams = useSearchParams();
   const highlightSlug = searchParams.get("highlight");
   const highlightedRef = useRef<HTMLDivElement>(null);
@@ -93,6 +102,13 @@ export function CategoryPageClient({ category, products, total }: CategoryPageCl
             </div>
           </div>
         )}
+
+        <CategoryBanner
+          categoryName={category.name}
+          categorySlug={category.slug}
+          showBoardBanner={showBoardBanner}
+          showGuideBanner={showGuideBanner}
+        />
 
         {products.length === 0 ? (
           <div className="text-center py-12">

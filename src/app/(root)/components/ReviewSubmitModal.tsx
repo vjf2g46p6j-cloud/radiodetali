@@ -71,7 +71,7 @@ export function ReviewSubmitModal() {
       <button
         type="button"
         onClick={handleOpen}
-        className="inline-flex items-center gap-1.5 text-white/50 hover:text-amber-300 transition-colors text-sm"
+        className="inline-flex items-center gap-1.5 text-white/50 hover:text-[var(--accent-400)] transition-colors text-sm cursor-pointer"
       >
         <MessageSquare className="w-3.5 h-3.5" />
         Оставить отзыв

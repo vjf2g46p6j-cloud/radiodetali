@@ -1,19 +1,18 @@
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 import { Suspense } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import Image from "next/image";
 import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 import {
-  ArrowLeft,
-  ChevronRight,
-  Scale,
-  Info,
-  Phone,
-} from "lucide-react";
-import { getProductBySlug, getProducts, getCategoryBySlug, getGlobalSettings, type UnitType, type ModificationWithPrice } from "@/app/actions";
-import { ProductCard, ProductGridSkeleton, SellModal } from "../../../components";
+  getProductBySlug,
+  getProducts,
+  getCategoryBySlug,
+  getGlobalSettings,
+} from "@/app/actions";
+import { ProductCard, ProductGridSkeleton } from "../../../components";
+import { ProductDetailView } from "../../../components/ProductDetailView";
 import type { SellModalContactInfo } from "../../../components";
 
 interface ProductPageProps {
@@ -22,35 +21,10 @@ interface ProductPageProps {
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
-// Получить суффикс единицы измерения для цены
-function getPriceUnitSuffix(unitType: UnitType): string {
-  switch (unitType) {
-    case "GRAM": return "/г.";
-    case "KG": return "/кг.";
-    default: return "/шт.";
-  }
-}
-
-// Получить единицу измерения для описания
-function getUnitLabel(unitType: UnitType): string {
-  switch (unitType) {
-    case "GRAM": return "грамм";
-    case "KG": return "килограмм";
-    default: return "штуку";
-  }
-}
-
-// Получить краткое название единицы
-function getUnitShort(unitType: UnitType): string {
-  switch (unitType) {
-    case "GRAM": return "1 г";
-    case "KG": return "1 кг";
-    default: return "1 шт";
-  }
-}
-
-// Получить основную цену товара (первую доступную)
-function getDisplayPrice(product: { priceNew: number | null; priceUsed: number | null }): number {
+function getDisplayPrice(product: {
+  priceNew: number | null;
+  priceUsed: number | null;
+}): number {
   return product.priceNew ?? product.priceUsed ?? 0;
 }
 
@@ -78,14 +52,18 @@ export async function generateMetadata({
     : undefined;
 
   return {
-    title: { absolute: `Скупаем ${seoName} по высоким ценам в Санкт-Петербурге | Любые объемы, честное взвешивание, оплата сразу | ДрагСоюз СПб` },
+    title: {
+      absolute: `Скупаем ${seoName} по высоким ценам в Санкт-Петербурге | Любые объемы, честное взвешивание, оплата сразу | ДрагСоюз СПб`,
+    },
     description: product.seoDescription || autoDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
       title: `Скупаем ${seoName} в Санкт-Петербурге | ДрагСоюз СПб`,
-      description: product.seoDescription || `Сдать ${seoName} дорого в СПб. Оценка по фото, оплата сразу.`,
+      description:
+        product.seoDescription ||
+        `Сдать ${seoName} дорого в СПб. Оценка по фото, оплата сразу.`,
       type: "website",
       url: canonicalUrl,
       images: imageUrl ? [{ url: imageUrl, alt: product.name }] : undefined,
@@ -93,7 +71,6 @@ export async function generateMetadata({
   };
 }
 
-// JSON-LD Schema.org Product
 interface ProductSchemaProps {
   name: string;
   description?: string | null;
@@ -103,9 +80,18 @@ interface ProductSchemaProps {
   productSlug: string;
 }
 
-function ProductSchema({ name, description, image, price, categorySlug, productSlug }: ProductSchemaProps) {
-  const imageUrl = image 
-    ? (image.startsWith("http") ? image : `${BASE_URL}${image}`)
+function ProductSchema({
+  name,
+  description,
+  image,
+  price,
+  categorySlug,
+  productSlug,
+}: ProductSchemaProps) {
+  const imageUrl = image
+    ? image.startsWith("http")
+      ? image
+      : `${BASE_URL}${image}`
     : undefined;
 
   const schema = {
@@ -131,7 +117,6 @@ function ProductSchema({ name, description, image, price, categorySlug, productS
   );
 }
 
-// JSON-LD Schema.org BreadcrumbList
 interface BreadcrumbSchemaProps {
   categoryName: string;
   categorySlug: string;
@@ -139,7 +124,12 @@ interface BreadcrumbSchemaProps {
   productSlug: string;
 }
 
-function BreadcrumbSchema({ categoryName, categorySlug, productName, productSlug }: BreadcrumbSchemaProps) {
+function BreadcrumbSchema({
+  categoryName,
+  categorySlug,
+  productName,
+  productSlug,
+}: BreadcrumbSchemaProps) {
   const schema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -179,110 +169,6 @@ function BreadcrumbSchema({ categoryName, categorySlug, productName, productSlug
   );
 }
 
-// Форматирование цены
-function formatDetailPrice(price: number): string {
-  return new Intl.NumberFormat("ru-RU", {
-    style: "currency",
-    currency: "RUB",
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
-  }).format(price);
-}
-
-// Таблица модификаций для страницы товара (более просторная версия)
-function ModificationsDetailTable({
-  modifications,
-  isSingleType,
-  isNewAvailable,
-  isUsedAvailable,
-  isPriceOnRequest,
-  unitType,
-  modLabel,
-}: {
-  modifications: ModificationWithPrice[];
-  isSingleType: boolean;
-  isNewAvailable: boolean;
-  isUsedAvailable: boolean;
-  isPriceOnRequest: boolean;
-  unitType: UnitType;
-  modLabel?: string;
-}) {
-  const suffix = getPriceUnitSuffix(unitType);
-  const showBothPrices = !isSingleType && isNewAvailable && isUsedAvailable;
-
-  return (
-    <div className="bg-gradient-to-r from-[var(--accent-50)] to-[var(--accent-100)] rounded-xl p-4 sm:p-6 mb-6 border border-[var(--accent-200)]">
-      <div className="flex items-center justify-between mb-4">
-        <p className="text-sm text-[var(--gray-600)]">
-          Цены скупки за {getUnitShort(unitType)}
-        </p>
-        <Scale className="w-8 h-8 text-[var(--accent-400)] shrink-0" />
-      </div>
-
-      {isPriceOnRequest ? (
-        <p className="text-xl md:text-2xl font-medium text-slate-500 italic">
-          Цена по запросу
-        </p>
-      ) : (
-        <div className="bg-white rounded-lg border border-[var(--accent-200)] overflow-hidden">
-          {/* Заголовок таблицы */}
-          <div className={`flex items-center bg-[var(--gray-100)] text-xs sm:text-sm font-bold text-[var(--gray-900)] border-b border-[var(--gray-200)]`}>
-            <span className="flex-1 px-3 py-2">{modLabel || "Модификация"}</span>
-            {showBothPrices ? (
-              <>
-                <span className="w-24 sm:w-32 text-right px-3 py-2">Новые</span>
-                <span className="w-24 sm:w-32 text-right px-3 py-2">Б/У</span>
-              </>
-            ) : (
-              <span className="w-28 sm:w-36 text-right px-3 py-2">
-                {isSingleType ? "Цена" : isNewAvailable ? "Новые" : "Б/У"}
-              </span>
-            )}
-          </div>
-          {/* Строки модификаций */}
-          {modifications.map((mod, idx) => {
-            const price = isSingleType || isNewAvailable ? mod.priceNew : mod.priceUsed;
-            const isLast = idx === modifications.length - 1;
-            return (
-              <div
-                key={mod.id}
-                className={`flex items-center ${!isLast ? 'border-b border-[var(--gray-200)]' : ''} hover:bg-[var(--accent-50)] transition-colors`}
-              >
-                <span className="flex-1 px-3 py-2 sm:py-2.5 text-sm sm:text-base text-[var(--gray-800)] tabular-nums">
-                  {mod.name}
-                </span>
-                {showBothPrices ? (
-                  <>
-                    <span className="w-24 sm:w-32 text-right px-3 py-2 sm:py-2.5 text-sm sm:text-lg font-bold text-green-700 whitespace-nowrap tabular-nums">
-                      {formatDetailPrice(mod.priceNew)}{suffix}
-                    </span>
-                    <span className="w-24 sm:w-32 text-right px-3 py-2 sm:py-2.5 text-sm sm:text-lg font-bold text-amber-700 whitespace-nowrap tabular-nums">
-                      {formatDetailPrice(mod.priceUsed)}{suffix}
-                    </span>
-                  </>
-                ) : (
-                  <span className="w-28 sm:w-36 text-right px-3 py-2 sm:py-2.5 text-sm sm:text-lg font-bold text-[var(--gray-900)] whitespace-nowrap tabular-nums">
-                    {formatDetailPrice(price)}{suffix}
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <p className="text-xs text-[var(--gray-500)] mt-3 flex items-center gap-1">
-        <Info className="w-3 h-3" />
-        {isPriceOnRequest
-          ? "Свяжитесь с нами для уточнения стоимости"
-          : "Цены рассчитаны по актуальному курсу драгметаллов"
-        }
-      </p>
-    </div>
-  );
-}
-
-// Related products
 async function RelatedProducts({
   categoryId,
   currentId,
@@ -305,13 +191,17 @@ async function RelatedProducts({
   }
 
   return (
-    <section className="mt-12 md:mt-16">
+    <section className="mt-10 lg:mt-14 pt-8 border-t border-[var(--gray-200)]">
       <h2 className="text-xl md:text-2xl font-bold text-[var(--gray-900)] mb-6">
         Похожие товары
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {relatedProducts.slice(0, 4).map((product) => (
-          <ProductCard key={product.id} product={product} categorySlug={categorySlug} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            categorySlug={categorySlug}
+          />
         ))}
       </div>
     </section>
@@ -320,16 +210,14 @@ async function RelatedProducts({
 
 export default async function ProductPage({ params }: ProductPageProps) {
   const { slug: categorySlug, productSlug } = await params;
-  
-  // Verify category exists
+
   const categoryResult = await getCategoryBySlug(categorySlug);
   if (!categoryResult.success) {
     notFound();
   }
   const category = categoryResult.data;
-  
-  const result = await getProductBySlug(productSlug);
 
+  const result = await getProductBySlug(productSlug);
   if (!result.success) {
     notFound();
   }
@@ -337,21 +225,21 @@ export default async function ProductPage({ params }: ProductPageProps) {
   const product = result.data;
   const displayPrice = getDisplayPrice(product);
 
-  // Получаем контактные данные для SellModal
   const settingsResult = await getGlobalSettings();
   const settings = settingsResult.success ? settingsResult.data : null;
-  const sellContactInfo: SellModalContactInfo | undefined = settings ? {
-    phoneNumber: settings.phoneNumber || "+7 (812) 983-49-76",
-    phoneHref: `tel:${(settings.phoneNumber || "+78129834976").replace(/[^\d+]/g, "")}`,
-    telegramHref: `https://t.me/${(settings.telegramUsername || "dragsoyuz").replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "")}`,
-    vkHref: settings.vkLink || "https://vk.com/dragsoyuz",
-  } : undefined;
+  const sellContactInfo: SellModalContactInfo | undefined = settings
+    ? {
+        phoneNumber: settings.phoneNumber || "+7 (812) 983-49-76",
+        phoneHref: `tel:${(settings.phoneNumber || "+78129834976").replace(/[^\d+]/g, "")}`,
+        telegramHref: `https://t.me/${(settings.telegramUsername || "dragsoyuz").replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "")}`,
+        vkHref: settings.vkLink || "https://vk.com/dragsoyuz",
+      }
+    : undefined;
 
   return (
     <>
-      {/* JSON-LD Schema.org structured data */}
       <ProductSchema
-        name={product.name}
+        name={product.seoH1 || product.name}
         description={product.description}
         image={product.image}
         price={displayPrice}
@@ -364,195 +252,59 @@ export default async function ProductPage({ params }: ProductPageProps) {
         productName={product.name}
         productSlug={productSlug}
       />
-      
+
       <div className="min-h-screen bg-[var(--gray-50)]">
-      {/* Breadcrumbs */}
-      <div className="bg-white border-b border-[var(--gray-200)]">
-        <div className="container mx-auto px-4 py-3">
-          <nav className="flex items-center gap-2 text-sm text-[var(--gray-500)] overflow-x-auto">
-            <Link
-              href="/"
-              className="hover:text-[var(--primary-600)] whitespace-nowrap"
+        <div className="bg-white border-b border-[var(--gray-200)]">
+          <div className="container mx-auto px-4 py-3">
+            <nav
+              className="flex items-center gap-2 text-sm text-[var(--gray-500)] overflow-x-auto"
+              aria-label="Хлебные крошки"
             >
-              Главная
-            </Link>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-            <Link
-              href="/catalog"
-              className="hover:text-[var(--primary-600)] whitespace-nowrap"
-            >
-              Каталог
-            </Link>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-            <Link
-              href={`/catalog/${categorySlug}`}
-              className="hover:text-[var(--primary-600)] whitespace-nowrap"
-            >
-              {category.name}
-            </Link>
-            <ChevronRight className="w-4 h-4 shrink-0" />
-            <span className="text-[var(--gray-900)] font-medium truncate">
-              {product.name}
-            </span>
-          </nav>
-        </div>
-      </div>
-
-      {/* Main content */}
-      <div className="container mx-auto px-4 py-8">
-        {/* Back button - visible on all screens */}
-        <Link
-          href={`/catalog/${categorySlug}`}
-          className="inline-flex items-center gap-2 text-[var(--primary-600)] hover:text-[var(--primary-700)] mb-6 font-medium"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Назад в раздел «{category.name}»
-        </Link>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product image */}
-          <div className="relative aspect-square bg-white rounded-2xl border border-[var(--gray-200)] overflow-hidden">
-            {product.image ? (
-              <Image
-                src={product.image}
-                alt={product.name}
-                fill
-                className="object-contain p-8"
-                sizes="(max-width: 1024px) 100vw, 50vw"
-                priority
-              />
-            ) : (
-              <div className="absolute inset-0 bg-gray-100 flex items-center justify-center">
-                <span className="text-gray-400 text-sm font-medium">Загрузка фото</span>
-              </div>
-            )}
-            {/* Category badge */}
-            <span className="absolute top-4 left-4 px-3 py-1.5 bg-[var(--primary-900)]/90 text-white text-sm rounded-lg">
-              {category.name}
-            </span>
-          </div>
-
-          {/* Product info */}
-          <div>
-            {/* Title */}
-            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[var(--gray-900)] mb-6">
-              {product.seoH1 || product.name}
-            </h1>
-
-            {/* Price block */}
-            {product.hasModifications && product.modifications.length > 0 ? (
-              /* === Товар с модификациями === */
-              <ModificationsDetailTable
-                modifications={product.modifications}
-                isSingleType={product.isSingleType}
-                isNewAvailable={product.isNewAvailable}
-                isUsedAvailable={product.isUsedAvailable}
-                isPriceOnRequest={product.isPriceOnRequest}
-                unitType={product.unitType}
-                modLabel={product.modLabel}
-              />
-            ) : (
-              /* === Обычный товар === */
-              <div className="bg-gradient-to-r from-[var(--accent-50)] to-[var(--accent-100)] rounded-xl p-6 mb-6 border border-[var(--accent-200)]">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1">
-                    <p className="text-sm text-[var(--gray-600)] mb-3">
-                      Цена скупки за {getUnitShort(product.unitType)}
-                    </p>
-                    {product.isPriceOnRequest ? (
-                      <p className="text-xl md:text-2xl font-medium text-slate-500 italic">
-                        Цена по запросу
-                      </p>
-                    ) : (
-                      <div className="space-y-2">
-                        {/* Цена за Новое */}
-                        {product.priceNew !== null && (
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 bg-green-100 px-3 py-2 sm:px-4 sm:py-3 rounded-lg">
-                            <span className="text-xs sm:text-sm font-medium text-green-700">
-                              {product.isSingleType ? "Цена" : "Новые"}
-                            </span>
-                            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-green-700">
-                              {formatDetailPrice(product.priceNew)}{getPriceUnitSuffix(product.unitType)}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Цена за Б/У */}
-                        {product.priceUsed !== null && !product.isSingleType && (
-                          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 bg-amber-100 px-3 py-2 sm:px-4 sm:py-3 rounded-lg">
-                            <span className="text-xs sm:text-sm font-medium text-amber-700">Б/У</span>
-                            <span className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-700">
-                              {formatDetailPrice(product.priceUsed)}{getPriceUnitSuffix(product.unitType)}
-                            </span>
-                          </div>
-                        )}
-                        
-                        {/* Если нет цен */}
-                        {product.priceNew === null && product.priceUsed === null && (
-                          <p className="text-lg text-[var(--gray-500)] italic">
-                            Не принимается
-                          </p>
-                        )}
-                      </div>
-                    )}
-                    <p className="text-xs text-[var(--gray-500)] mt-3 flex items-center gap-1">
-                      <Info className="w-3 h-3" />
-                      {product.isPriceOnRequest 
-                        ? "Свяжитесь с нами для уточнения стоимости"
-                        : "Цена рассчитана по актуальному курсу драгметаллов"
-                      }
-                    </p>
-                  </div>
-                  <Scale className="w-12 h-12 text-[var(--accent-400)] shrink-0" />
-                </div>
-              </div>
-            )}
-
-            {/* CTA buttons */}
-            <div className="flex flex-col gap-3 mb-8">
-              <SellModal contactInfo={sellContactInfo} />
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a
-                  href="tel:+79001234567"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-[var(--primary-600)] hover:bg-[var(--primary-700)] text-white rounded-xl font-semibold transition-colors"
-                >
-                  <Phone className="w-5 h-5" />
-                  Позвонить
-                </a>
-                <Link
-                  href="/contacts"
-                  className="flex-1 flex items-center justify-center gap-2 px-6 py-3 border border-[var(--gray-300)] hover:bg-[var(--gray-50)] text-[var(--gray-700)] rounded-xl font-medium transition-colors"
-                >
-                  Все контакты
-                </Link>
-              </div>
-            </div>
-
-            {/* Additional info */}
-            <div className="mt-6 p-4 bg-[var(--primary-50)] rounded-xl border border-[var(--primary-100)]">
-              <h3 className="font-semibold text-[var(--primary-800)] mb-2">
-                Как сдать эту деталь?
-              </h3>
-              <ol className="text-sm text-[var(--primary-700)] space-y-1 list-decimal list-inside">
-                <li>Соберите все детали данного типа</li>
-                <li>Свяжитесь с нами по телефону или форме обратной связи</li>
-                <li>Привезите детали</li>
-                <li>Получите оплату сразу после оценки</li>
-              </ol>
-            </div>
+              <Link
+                href="/"
+                className="hover:text-[var(--primary-600)] whitespace-nowrap"
+              >
+                Главная
+              </Link>
+              <ChevronRight className="w-4 h-4 shrink-0" />
+              <Link
+                href="/catalog"
+                className="hover:text-[var(--primary-600)] whitespace-nowrap"
+              >
+                Каталог
+              </Link>
+              <ChevronRight className="w-4 h-4 shrink-0" />
+              <Link
+                href={`/catalog/${categorySlug}`}
+                className="hover:text-[var(--primary-600)] whitespace-nowrap"
+              >
+                {category.name}
+              </Link>
+              <ChevronRight className="w-4 h-4 shrink-0" />
+              <span className="text-[var(--gray-900)] font-medium truncate max-w-[12rem] sm:max-w-none">
+                {product.name}
+              </span>
+            </nav>
           </div>
         </div>
 
-        {/* Related products */}
-        <Suspense fallback={<ProductGridSkeleton count={4} />}>
-          <RelatedProducts
-            categoryId={product.categoryId}
-            currentId={product.id}
+        <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+          <ProductDetailView
+            product={product}
+            categoryName={category.name}
             categorySlug={categorySlug}
+            sellContactInfo={sellContactInfo}
           />
-        </Suspense>
+
+          <Suspense fallback={<ProductGridSkeleton count={4} />}>
+            <RelatedProducts
+              categoryId={product.categoryId}
+              currentId={product.id}
+              categorySlug={categorySlug}
+            />
+          </Suspense>
+        </div>
       </div>
-    </div>
     </>
   );
 }

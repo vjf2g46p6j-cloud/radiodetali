@@ -73,6 +73,9 @@ COPY --from=builder /app/prisma.config.ts ./prisma.config.ts
 # Копируем скрипты (seed и др.)
 COPY --from=builder /app/scripts ./scripts
 
+# Справочники категорий (content/category-guides/*.md)
+COPY --from=builder /app/content ./content
+
 # Копируем entrypoint скрипт
 COPY docker-entrypoint.sh ./docker-entrypoint.sh
 RUN chmod +x ./docker-entrypoint.sh

@@ -156,13 +156,6 @@ export function ProductCardCompact({ product, categorySlug, contactInfo }: Produ
             </h3>
           </Link>
 
-          {/* Description */}
-          {product.description && (
-            <p className="text-sm font-medium text-[var(--gray-900)] mb-5 line-clamp-2">
-              {product.description}
-            </p>
-          )}
-
         {/* Prices */}
         <div>
           {/* Цена по запросу */}

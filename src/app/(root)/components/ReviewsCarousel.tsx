@@ -12,7 +12,7 @@ export type ReviewDisplay = {
 function ReviewCard({ review }: { review: ReviewDisplay }) {
   return (
     <article
-      className="group relative h-full bg-white rounded-2xl border border-[var(--gray-200)] p-6 shadow-sm hover:shadow-lg hover:border-amber-300/60 transition-all duration-300"
+      className="group relative h-full bg-white rounded-2xl border border-[var(--gray-200)] p-6 shadow-sm hover:shadow-lg hover:border-[var(--accent-400)] transition-all duration-300"
     >
       <div className="absolute top-5 right-5 opacity-20 group-hover:opacity-40 transition-opacity">
         <Quote className="w-8 h-8 text-amber-500" />
@@ -113,7 +113,7 @@ export function ReviewsCarousel({ reviews }: { reviews: ReviewDisplay[] }) {
         type="button"
         onClick={goPrev}
         disabled={currentIndex === 0}
-        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 md:-translate-x-3 z-10 w-10 h-10 rounded-full bg-white border border-[var(--gray-200)] shadow-md flex items-center justify-center text-[var(--gray-700)] hover:bg-amber-50 hover:border-amber-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1 md:-translate-x-3 z-10 w-10 h-10 rounded-full bg-white border border-[var(--gray-200)] shadow-md flex items-center justify-center text-[var(--gray-700)] hover:text-[var(--accent-400)] hover:border-[var(--accent-400)] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
         aria-label="Предыдущий отзыв"
       >
         <ChevronLeft className="w-5 h-5" />
@@ -123,7 +123,7 @@ export function ReviewsCarousel({ reviews }: { reviews: ReviewDisplay[] }) {
         type="button"
         onClick={goNext}
         disabled={currentIndex >= maxIndex}
-        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 md:translate-x-3 z-10 w-10 h-10 rounded-full bg-white border border-[var(--gray-200)] shadow-md flex items-center justify-center text-[var(--gray-700)] hover:bg-amber-50 hover:border-amber-300 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+        className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1 md:translate-x-3 z-10 w-10 h-10 rounded-full bg-white border border-[var(--gray-200)] shadow-md flex items-center justify-center text-[var(--gray-700)] hover:text-[var(--accent-400)] hover:border-[var(--accent-400)] disabled:opacity-40 disabled:pointer-events-none transition-colors cursor-pointer"
         aria-label="Следующий отзыв"
       >
         <ChevronRight className="w-5 h-5" />
@@ -135,10 +135,10 @@ export function ReviewsCarousel({ reviews }: { reviews: ReviewDisplay[] }) {
             key={index}
             type="button"
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all ${
+            className={`h-2 rounded-full transition-all cursor-pointer ${
               index === currentIndex
-                ? "w-6 bg-amber-500"
-                : "w-2 bg-[var(--gray-300)] hover:bg-amber-300"
+                ? "w-6 bg-[var(--accent-500)]"
+                : "w-2 bg-[var(--gray-300)] hover:bg-[var(--accent-400)]"
             }`}
             aria-label={`Слайд ${index + 1}`}
           />

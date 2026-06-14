@@ -6,6 +6,10 @@ import { notFound } from "next/navigation";
 import { getCategoryBySlug, getProducts } from "@/app/actions";
 import { ProductGridSkeleton } from "../../components";
 import { CategoryPageClient } from "./CategoryPageClient";
+import {
+  showBoardBanner,
+  showGuideBanner,
+} from "@/lib/category-banners";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -113,6 +117,8 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           }}
           products={productsResult.data}
           total={productsResult.total}
+          showBoardBanner={showBoardBanner(category.slug, category.productCount)}
+          showGuideBanner={showGuideBanner(category.slug)}
         />
       </Suspense>
     </>

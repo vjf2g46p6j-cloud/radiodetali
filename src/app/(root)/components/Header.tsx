@@ -130,9 +130,9 @@ export function Header({ contactInfo }: HeaderProps) {
   const menuItems = [
     { href: "/", label: "Главная", icon: Home },
     { href: "/catalog", label: "Каталог", icon: Package },
-    { href: "/how-to-sell", label: "Как сдать", icon: ClipboardList },
     { href: "/postal", label: "Почтовые отправления", icon: Mail },
     { href: "/contacts", label: "Контакты", icon: MapPin },
+    { href: "/how-to-sell", label: "Как сдать", icon: ClipboardList },
     { href: "/about", label: "О нас", icon: Zap },
   ];
 

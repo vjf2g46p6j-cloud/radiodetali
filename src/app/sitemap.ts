@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { listCategoryGuideSlugs } from "@/lib/category-banners";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
@@ -83,7 +84,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }));
 
-    return [...staticPages, ...categoryPages, ...productPages];
+    const guideSlugs = listCategoryGuideSlugs();
+    const guidePages: MetadataRoute.Sitemap = guideSlugs.map((slug) => {
+      const category = categories.find((c) => c.slug === slug);
+      return {
+        url: `${BASE_URL}/catalog/${slug}/guide`,
+        lastModified: category?.updatedAt ?? new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.6,
+      };
+    });
+
+    return [...staticPages, ...categoryPages, ...productPages, ...guidePages];
   } catch (error) {
     // Если БД недоступна, возвращаем только статические страницы
     console.error("Sitemap: Database unavailable, returning static pages only", error);
