@@ -3,9 +3,11 @@ import Image from "next/image";
 import { AlertTriangle, ArrowRight, BookOpen } from "lucide-react";
 import {
   type CategoryBannerConfig,
+  type CategoryBannerAlign,
   type CategoryBannerTheme,
   getBannerAlignClasses,
   getBannerThemeStyle,
+  resolveBannerDisplay,
   resolveCategoryBannerContent,
 } from "@/lib/category-banner";
 
@@ -18,30 +20,122 @@ export interface CategoryBannersProps {
   showGuideBanner: boolean;
 }
 
+function getDecorLineColor(
+  textColor: string | null | undefined,
+  theme: CategoryBannerTheme,
+  hasImage: boolean,
+): string {
+  if (textColor) return textColor;
+  if (theme === "BRAND" || (theme === "IMAGE" && hasImage)) {
+    return "rgba(255, 255, 255, 0.5)";
+  }
+  if (theme === "NOTICE" || theme === "ACCENT") {
+    return "rgba(120, 53, 15, 0.35)";
+  }
+  return "rgba(100, 116, 139, 0.45)";
+}
+
+function BannerDecorLine({
+  color,
+}: {
+  color: string;
+}) {
+  return (
+    <div
+      className="h-[2px] min-w-[3.5rem] md:min-w-[5rem] flex-1 shrink"
+      style={{ backgroundColor: color }}
+      aria-hidden
+    />
+  );
+}
+
+function BannerHeading({
+  heading,
+  align,
+  textColor,
+  titleLines,
+  titleClass,
+  lineColor,
+}: {
+  heading: string;
+  align: CategoryBannerAlign;
+  textColor?: string | null;
+  titleLines: boolean;
+  titleClass: string;
+  lineColor: string;
+}) {
+  const customTextStyle = textColor ? { color: textColor } : undefined;
+
+  if (!titleLines) {
+    return (
+      <p
+        className={`text-base md:text-lg font-bold leading-snug ${textColor ? "" : titleClass}`}
+        style={customTextStyle}
+      >
+        {heading}
+      </p>
+    );
+  }
+
+  const rowAlign =
+    align === "CENTER"
+      ? "justify-center"
+      : align === "RIGHT"
+        ? "justify-end"
+        : "justify-start";
+
+  return (
+    <div
+      className={`flex w-full self-stretch items-center gap-3 md:gap-5 ${rowAlign}`}
+    >
+      {(align === "CENTER" || align === "RIGHT") && (
+        <BannerDecorLine color={lineColor} />
+      )}
+      <p
+        className={`shrink-0 text-base md:text-lg font-bold leading-snug ${
+          textColor ? "" : titleClass
+        }`}
+        style={customTextStyle}
+      >
+        {heading}
+      </p>
+      {(align === "CENTER" || align === "LEFT") && (
+        <BannerDecorLine color={lineColor} />
+      )}
+    </div>
+  );
+}
+
 interface BannerBlockProps {
-  title?: string | null;
-  text: string;
+  heading?: string | null;
+  body: string;
   theme: CategoryBannerTheme;
   align: CategoryBannerConfig["align"];
   imageUrl?: string | null;
   linkUrl?: string | null;
   linkLabel?: string | null;
+  textColor?: string | null;
+  titleLines: boolean;
   showNoticeIcon?: boolean;
 }
 
 function CategoryBannerBlock({
-  title,
-  text,
+  heading,
+  body,
   theme,
   align,
   imageUrl,
   linkUrl,
   linkLabel,
+  textColor,
+  titleLines,
   showNoticeIcon,
 }: BannerBlockProps) {
   const hasImage = theme === "IMAGE" && !!imageUrl;
   const styles = getBannerThemeStyle(theme, hasImage);
   const alignClasses = getBannerAlignClasses(align);
+  const customTextStyle = textColor ? { color: textColor } : undefined;
+  const lineColor = getDecorLineColor(textColor, theme, hasImage);
 
   return (
     <div
@@ -61,9 +155,9 @@ function CategoryBannerBlock({
       )}
 
       <div
-        className={`relative z-10 flex w-full flex-col gap-3 ${alignClasses.outer} ${alignClasses.text}`}
+        className={`relative z-10 flex w-full flex-col gap-3 self-stretch ${alignClasses.outer} ${alignClasses.text}`}
       >
-        {showNoticeIcon && theme === "NOTICE" && (
+        {showNoticeIcon && theme === "NOTICE" && !titleLines && (
           <div
             className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${styles.icon} ${alignClasses.icon}`}
           >
@@ -71,21 +165,27 @@ function CategoryBannerBlock({
           </div>
         )}
 
-        {title && (
-          <p
-            className={`text-base md:text-lg font-bold leading-snug ${styles.title}`}
-          >
-            {title}
-          </p>
+        {heading && (
+          <BannerHeading
+            heading={heading}
+            align={align}
+            textColor={textColor}
+            titleLines={titleLines}
+            titleClass={styles.title}
+            lineColor={lineColor}
+          />
         )}
 
-        <p
-          className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap ${styles.text} ${
-            title ? "" : "font-medium"
-          }`}
-        >
-          {text}
-        </p>
+        {body && (
+          <p
+            className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap ${
+              textColor ? "" : styles.text
+            } ${heading ? "" : "font-medium"}`}
+            style={customTextStyle}
+          >
+            {body}
+          </p>
+        )}
 
         {linkUrl && linkLabel && (
           <a
@@ -109,30 +209,33 @@ export function CategoryBanners({
   bannerTextLegacy,
   showGuideBanner,
 }: CategoryBannersProps) {
-  const content = resolveCategoryBannerContent(
+  const rawContent = resolveCategoryBannerContent(
     warningMessage,
     banner.title,
     bannerTextLegacy,
   );
+  const display = resolveBannerDisplay(rawContent, banner.titleLines);
 
   const showGuide =
     showGuideBanner && banner.showGuide && categorySlug !== "preview";
 
-  if (!content && !showGuide) {
+  if (!display && !showGuide) {
     return null;
   }
 
   return (
     <div className="mb-6 space-y-2">
-      {content && (
+      {display && (display.heading || display.body) && (
         <CategoryBannerBlock
-          title={content.title}
-          text={content.text}
+          heading={display.heading}
+          body={display.body}
           theme={banner.theme}
           align={banner.align}
           imageUrl={banner.imageUrl}
           linkUrl={banner.linkUrl?.trim() || null}
           linkLabel={banner.linkLabel?.trim() || null}
+          textColor={banner.textColor}
+          titleLines={banner.titleLines}
           showNoticeIcon
         />
       )}

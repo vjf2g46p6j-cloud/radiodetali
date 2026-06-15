@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 import type { CategoryBannerAlign, CategoryBannerTheme } from "@prisma/client";
+import { normalizeBannerTextColor } from "@/lib/category-banner";
 
 // ============================================================================
 // ТИПЫ
@@ -17,6 +18,8 @@ function pickBannerFields(category: {
   bannerImageUrl: string | null;
   bannerLinkUrl: string | null;
   bannerLinkLabel: string | null;
+  bannerTextColor: string | null;
+  bannerTitleLines: boolean;
   bannerShowGuide: boolean;
 }) {
   return {
@@ -28,6 +31,8 @@ function pickBannerFields(category: {
     bannerImageUrl: category.bannerImageUrl,
     bannerLinkUrl: category.bannerLinkUrl,
     bannerLinkLabel: category.bannerLinkLabel,
+    bannerTextColor: category.bannerTextColor,
+    bannerTitleLines: category.bannerTitleLines,
     bannerShowGuide: category.bannerShowGuide,
   };
 }
@@ -41,6 +46,8 @@ function pickBannerInput(input: {
   bannerImageUrl?: string | null;
   bannerLinkUrl?: string | null;
   bannerLinkLabel?: string | null;
+  bannerTextColor?: string | null;
+  bannerTitleLines?: boolean;
   bannerShowGuide?: boolean;
 }) {
   const data: Record<string, unknown> = {};
@@ -52,6 +59,10 @@ function pickBannerInput(input: {
   if (input.bannerImageUrl !== undefined) data.bannerImageUrl = input.bannerImageUrl || null;
   if (input.bannerLinkUrl !== undefined) data.bannerLinkUrl = input.bannerLinkUrl?.trim() || null;
   if (input.bannerLinkLabel !== undefined) data.bannerLinkLabel = input.bannerLinkLabel?.trim() || null;
+  if (input.bannerTextColor !== undefined) {
+    data.bannerTextColor = normalizeBannerTextColor(input.bannerTextColor);
+  }
+  if (input.bannerTitleLines !== undefined) data.bannerTitleLines = input.bannerTitleLines;
   if (input.bannerShowGuide !== undefined) data.bannerShowGuide = input.bannerShowGuide;
   return data;
 }
@@ -77,6 +88,8 @@ export interface CategoryData {
   bannerImageUrl: string | null;
   bannerLinkUrl: string | null;
   bannerLinkLabel: string | null;
+  bannerTextColor: string | null;
+  bannerTitleLines: boolean;
   bannerShowGuide: boolean;
   isPinnedToDashboard: boolean;
   customRateAu: number | null;
@@ -108,6 +121,8 @@ export interface CreateCategoryInput {
   bannerImageUrl?: string | null;
   bannerLinkUrl?: string | null;
   bannerLinkLabel?: string | null;
+  bannerTextColor?: string | null;
+  bannerTitleLines?: boolean;
   bannerShowGuide?: boolean;
   isPinnedToDashboard?: boolean;
   customRateAu?: number | null;
@@ -136,6 +151,8 @@ export interface UpdateCategoryInput {
   bannerImageUrl?: string | null;
   bannerLinkUrl?: string | null;
   bannerLinkLabel?: string | null;
+  bannerTextColor?: string | null;
+  bannerTitleLines?: boolean;
   bannerShowGuide?: boolean;
   isPinnedToDashboard?: boolean;
   customRateAu?: number | null;

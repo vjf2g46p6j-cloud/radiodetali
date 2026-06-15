@@ -9,7 +9,28 @@ export interface CategoryBannerConfig {
   imageUrl: string | null;
   linkUrl: string | null;
   linkLabel: string | null;
+  textColor: string | null;
+  titleLines: boolean;
   showGuide: boolean;
+}
+
+/** Золотистый пресет для текста баннера */
+export const BANNER_GOLD_TEXT_COLOR = "#E8C547";
+
+export const BANNER_TEXT_COLOR_PRESETS: {
+  id: "default" | "gold";
+  label: string;
+  color: string | null;
+}[] = [
+  { id: "default", label: "По умолчанию", color: null },
+  { id: "gold", label: "Золотой", color: BANNER_GOLD_TEXT_COLOR },
+];
+
+export function normalizeBannerTextColor(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+  if (/^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(trimmed)) return trimmed;
+  return null;
 }
 
 export const BANNER_ALIGN_OPTIONS: {
@@ -42,15 +63,20 @@ export function bannerConfigFromCategory(category: {
   bannerImageUrl: string | null;
   bannerLinkUrl: string | null;
   bannerLinkLabel: string | null;
+  bannerTextColor: string | null;
+  bannerTitleLines: boolean;
   bannerShowGuide: boolean;
 }): CategoryBannerConfig {
   const hasLegacyWarning = !!category.warningMessage?.trim();
+  const textColor = normalizeBannerTextColor(category.bannerTextColor);
   const customized =
     !!category.bannerTitle?.trim() ||
     !!category.bannerText?.trim() ||
     !!category.bannerImageUrl ||
     !!category.bannerLinkUrl?.trim() ||
     !!category.bannerLinkLabel?.trim() ||
+    !!textColor ||
+    category.bannerTitleLines ||
     category.bannerAlign !== "LEFT" ||
     category.bannerTheme !== "SOFT";
 
@@ -65,6 +91,8 @@ export function bannerConfigFromCategory(category: {
     imageUrl: category.bannerImageUrl,
     linkUrl: category.bannerLinkUrl,
     linkLabel: category.bannerLinkLabel,
+    textColor,
+    titleLines: category.bannerTitleLines,
     showGuide: category.bannerShowGuide,
   };
 }
@@ -86,6 +114,34 @@ export function resolveCategoryBannerContent(
     return { title: null, text: title };
   }
   return null;
+}
+
+/** Заголовок с линиями: отдельное поле или первая строка текста */
+export function resolveBannerDisplay(
+  content: { title: string | null; text: string } | null,
+  titleLines: boolean,
+): { heading: string | null; body: string } | null {
+  if (!content) return null;
+
+  if (content.title?.trim()) {
+    return {
+      heading: content.title.trim(),
+      body: content.text,
+    };
+  }
+
+  if (titleLines && content.text.trim()) {
+    const nl = content.text.indexOf("\n");
+    if (nl > -1) {
+      return {
+        heading: content.text.slice(0, nl).trim(),
+        body: content.text.slice(nl + 1).trim(),
+      };
+    }
+    return { heading: content.text.trim(), body: "" };
+  }
+
+  return { heading: null, body: content.text };
 }
 
 export function getBannerAlignClasses(align: CategoryBannerAlign): {

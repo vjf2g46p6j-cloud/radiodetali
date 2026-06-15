@@ -3,6 +3,7 @@ import { Header, Footer, TopAlert } from "./components";
 import { getGlobalSettings } from "@/app/actions";
 import type { HeaderContactInfo } from "./components/Header";
 import type { FooterContactInfo } from "./components/Footer";
+import { JivoWidget } from "./components/JivoWidget";
 
 export const dynamic = "force-dynamic";
 
@@ -77,6 +78,7 @@ export default async function RootLayout({
       </div>
       <main className="flex-1">{children}</main>
       <Footer contactInfo={footerContactInfo} />
+      <JivoWidget />
     </div>
   );
 }

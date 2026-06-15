@@ -41,6 +41,8 @@ interface FormData {
   bannerImageUrl: string;
   bannerLinkUrl: string;
   bannerLinkLabel: string;
+  bannerTextColor: string;
+  bannerTitleLines: boolean;
   bannerShowGuide: boolean;
   // Закрепить управление курсом на Дашборде
   isPinnedToDashboard: boolean;
@@ -112,6 +114,8 @@ export function CategoryForm({
       bannerImageUrl: editCategory?.bannerImageUrl || "",
       bannerLinkUrl: editCategory?.bannerLinkUrl || "",
       bannerLinkLabel: editCategory?.bannerLinkLabel || "",
+      bannerTextColor: editCategory?.bannerTextColor || "",
+      bannerTitleLines: editCategory?.bannerTitleLines ?? false,
       bannerShowGuide: editCategory?.bannerShowGuide ?? true,
       isPinnedToDashboard: editCategory?.isPinnedToDashboard ?? false,
       customRateAu: editCategory?.customRateAu?.toString() || "",
@@ -229,6 +233,8 @@ export function CategoryForm({
           bannerImageUrl: data.bannerImageUrl || null,
           bannerLinkUrl: data.bannerLinkUrl || null,
           bannerLinkLabel: data.bannerLinkLabel || null,
+          bannerTextColor: data.bannerTextColor || null,
+          bannerTitleLines: data.bannerTitleLines,
           bannerShowGuide: data.bannerShowGuide,
           isPinnedToDashboard: data.isPinnedToDashboard,
           customRateAu: parseRate(data.customRateAu),
@@ -253,6 +259,8 @@ export function CategoryForm({
           bannerImageUrl: data.bannerImageUrl || null,
           bannerLinkUrl: data.bannerLinkUrl || null,
           bannerLinkLabel: data.bannerLinkLabel || null,
+          bannerTextColor: data.bannerTextColor || null,
+          bannerTitleLines: data.bannerTitleLines,
           bannerShowGuide: data.bannerShowGuide,
           isPinnedToDashboard: data.isPinnedToDashboard,
           customRateAu: parseRate(data.customRateAu),
@@ -455,11 +463,14 @@ export function CategoryForm({
               bannerImageUrl: watch("bannerImageUrl"),
               bannerLinkUrl: watch("bannerLinkUrl"),
               bannerLinkLabel: watch("bannerLinkLabel"),
+              bannerTextColor: watch("bannerTextColor"),
+              bannerTitleLines: watch("bannerTitleLines"),
               bannerShowGuide: watch("bannerShowGuide"),
             }}
             onWarningMessageChange={(value) =>
               setValue("warningMessage", value, { shouldDirty: true })
             }
+            registerTitleLines={register("bannerTitleLines")}
             onChange={(key, value) => {
               setValue(key as keyof FormData, value as never, { shouldDirty: true });
             }}

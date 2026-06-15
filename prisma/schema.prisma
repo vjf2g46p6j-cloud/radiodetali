@@ -95,6 +95,8 @@ model Category {
   bannerImageUrl     String?
   bannerLinkUrl      String?
   bannerLinkLabel    String?
+  bannerTextColor    String? // CSS-цвет текста (hex), null = из стиля темы
+  bannerTitleLines   Boolean @default(false) // Декоративные линии по бокам заголовка
   bannerShowGuide    Boolean             @default(true)
 
   // Закрепить управление курсом на Дашборде

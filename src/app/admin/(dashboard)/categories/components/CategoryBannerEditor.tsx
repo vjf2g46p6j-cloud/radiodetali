@@ -5,11 +5,14 @@ import Image from "next/image";
 import type { CategoryBannerAlign, CategoryBannerTheme } from "@prisma/client";
 import {
   BANNER_ALIGN_OPTIONS,
+  BANNER_GOLD_TEXT_COLOR,
+  BANNER_TEXT_COLOR_PRESETS,
   BANNER_THEME_OPTIONS,
   type CategoryBannerConfig,
 } from "@/lib/category-banner";
 import { CategoryBanners } from "@/app/(root)/components/CategoryBanner";
 import { AlignCenter, AlignLeft, AlignRight, Upload, X } from "lucide-react";
+import type { UseFormRegisterReturn } from "react-hook-form";
 
 export interface CategoryBannerFormValues {
   bannerTitle: string;
@@ -18,6 +21,8 @@ export interface CategoryBannerFormValues {
   bannerImageUrl: string;
   bannerLinkUrl: string;
   bannerLinkLabel: string;
+  bannerTextColor: string;
+  bannerTitleLines: boolean;
   bannerShowGuide: boolean;
 }
 
@@ -33,6 +38,7 @@ interface CategoryBannerEditorProps {
     key: K,
     value: CategoryBannerFormValues[K],
   ) => void;
+  registerTitleLines: UseFormRegisterReturn<"bannerTitleLines">;
 }
 
 export function CategoryBannerEditor({
@@ -44,6 +50,7 @@ export function CategoryBannerEditor({
   values,
   onWarningMessageChange,
   onChange,
+  registerTitleLines,
 }: CategoryBannerEditorProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -56,6 +63,8 @@ export function CategoryBannerEditor({
     imageUrl: values.bannerImageUrl.trim() || null,
     linkUrl: values.bannerLinkUrl.trim() || null,
     linkLabel: values.bannerLinkLabel.trim() || null,
+    textColor: values.bannerTextColor.trim() || null,
+    titleLines: values.bannerTitleLines,
     showGuide: values.bannerShowGuide,
   };
 
@@ -135,9 +144,28 @@ export function CategoryBannerEditor({
             value={values.bannerTitle}
             onChange={(e) => onChange("bannerTitle", e.target.value)}
             className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500"
-            placeholder="Короткий заголовок над текстом"
+            placeholder="Например: МИКРОСХЕМЫ"
           />
+          <p className="mt-1 text-xs text-slate-500">
+            Для линий по бокам — укажите заголовок или первую строку в тексте баннера
+          </p>
         </div>
+
+        <label className="flex items-start gap-3 cursor-pointer rounded-lg border border-slate-200 bg-slate-50 px-3 py-3">
+          <input
+            type="checkbox"
+            {...registerTitleLines}
+            className="mt-0.5 w-5 h-5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+          />
+          <span>
+            <span className="block text-sm font-medium text-slate-800">
+              Декоративные линии у заголовка
+            </span>
+            <span className="block text-xs text-slate-500 mt-0.5">
+              Горизонтальные полоски по бокам заголовка. Работает с полем «Заголовок» или с первой строкой текста.
+            </span>
+          </span>
+        </label>
 
         <div>
           <span className="block text-sm font-medium text-slate-700 mb-2">
@@ -194,6 +222,66 @@ export function CategoryBannerEditor({
                 </button>
               );
             })}
+          </div>
+        </div>
+
+        <div>
+          <span className="block text-sm font-medium text-slate-700 mb-2">
+            Цвет текста
+          </span>
+          <div className="flex flex-wrap gap-2 mb-3">
+            {BANNER_TEXT_COLOR_PRESETS.map((preset) => {
+              const isActive =
+                preset.color === null
+                  ? !values.bannerTextColor.trim()
+                  : values.bannerTextColor.trim().toLowerCase() ===
+                    preset.color.toLowerCase();
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() =>
+                    onChange("bannerTextColor", preset.color ?? "")
+                  }
+                  className={`px-3 py-1.5 rounded-full border text-sm transition-colors ${
+                    isActive
+                      ? "border-indigo-500 bg-indigo-50 text-indigo-700 font-medium"
+                      : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  }`}
+                >
+                  {preset.id === "gold" && (
+                    <span
+                      className="inline-block w-3 h-3 rounded-full mr-1.5 align-middle border border-amber-400/50"
+                      style={{ backgroundColor: BANNER_GOLD_TEXT_COLOR }}
+                    />
+                  )}
+                  {preset.label}
+                </button>
+              );
+            })}
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <input
+              type="color"
+              value={
+                /^#[0-9A-Fa-f]{6}$/.test(values.bannerTextColor.trim())
+                  ? values.bannerTextColor.trim()
+                  : BANNER_GOLD_TEXT_COLOR
+              }
+              onChange={(e) => onChange("bannerTextColor", e.target.value)}
+              className="h-10 w-14 cursor-pointer rounded-lg border border-slate-300 bg-white p-1"
+              title="Выбрать цвет"
+            />
+            <input
+              type="text"
+              value={values.bannerTextColor}
+              onChange={(e) => onChange("bannerTextColor", e.target.value)}
+              placeholder="#E8C547"
+              className="w-32 px-3 py-2 rounded-lg border border-slate-300 text-sm font-mono"
+            />
+            <span className="text-xs text-slate-500">
+              Свой hex-цвет или «По умолчанию» — цвет из стиля темы
+            </span>
           </div>
         </div>
 

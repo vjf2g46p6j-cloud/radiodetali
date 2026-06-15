@@ -24,6 +24,8 @@ WORKDIR /app
 # NEXT_PUBLIC_ переменные должны быть доступны во время билда
 ARG NEXT_PUBLIC_BASE_URL=https://драгсоюз.рф
 ENV NEXT_PUBLIC_BASE_URL=${NEXT_PUBLIC_BASE_URL}
+ARG NEXT_PUBLIC_JIVO_WIDGET_ID=mL1h2xDSrD
+ENV NEXT_PUBLIC_JIVO_WIDGET_ID=${NEXT_PUBLIC_JIVO_WIDGET_ID}
 
 # Копируем зависимости из предыдущего этапа
 COPY --from=deps /app/node_modules ./node_modules
