@@ -6,15 +6,13 @@ export type PreciousMetalInfo = {
   /** Тикер для отображения (платина на бирже — Pl, не Pt) */
   displaySymbol: string;
   name: string;
-  /** Номер в таблице Менделеева (не показываем для биржевого Pl) */
-  atomicNumber?: number;
 };
 
 export const PRECIOUS_METALS: Record<MetalSymbol, PreciousMetalInfo> = {
-  Au: { id: "Au", displaySymbol: "Au", atomicNumber: 79, name: "Золото" },
-  Ag: { id: "Ag", displaySymbol: "Ag", atomicNumber: 47, name: "Серебро" },
+  Au: { id: "Au", displaySymbol: "Au", name: "Золото" },
+  Ag: { id: "Ag", displaySymbol: "Ag", name: "Серебро" },
   Pt: { id: "Pt", displaySymbol: "Pl", name: "Платина" },
-  Pd: { id: "Pd", displaySymbol: "Pd", atomicNumber: 46, name: "Палладий" },
+  Pd: { id: "Pd", displaySymbol: "Pd", name: "Палладий" },
 };
 
 export const PRECIOUS_METAL_LIST: PreciousMetalInfo[] = [
