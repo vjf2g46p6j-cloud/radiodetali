@@ -1,3 +1,8 @@
+import {
+  formatPreciousMetalContent,
+  type MetalSymbol,
+} from "@/lib/price-calculator";
+
 interface ProductMetalContentProps {
   categoryName: string;
   productName: string;
@@ -8,39 +13,34 @@ interface ProductMetalContentProps {
   variant?: "standalone" | "embedded";
 }
 
-function formatMetalValue(value: number): string {
-  return new Intl.NumberFormat("ru-RU", {
-    maximumFractionDigits: 6,
-  }).format(value);
-}
-
-const METALS = [
+const METALS: {
+  key: MetalSymbol;
+  name: string;
+  field: "contentGold" | "contentSilver" | "contentPlatinum" | "contentPalladium";
+  badge: string;
+}[] = [
   {
     key: "Au",
     name: "Золото",
-    unit: "мг",
-    field: "contentGold" as const,
+    field: "contentGold",
     badge: "bg-amber-200 text-amber-900",
   },
   {
     key: "Ag",
     name: "Серебро",
-    unit: "г",
-    field: "contentSilver" as const,
+    field: "contentSilver",
     badge: "bg-slate-300 text-slate-800",
   },
   {
     key: "Pt",
     name: "Платина",
-    unit: "г",
-    field: "contentPlatinum" as const,
+    field: "contentPlatinum",
     badge: "bg-sky-200 text-sky-900",
   },
   {
     key: "Pd",
     name: "Палладий",
-    unit: "г",
-    field: "contentPalladium" as const,
+    field: "contentPalladium",
     badge: "bg-violet-200 text-violet-900",
   },
 ];
@@ -113,7 +113,7 @@ export function ProductMetalContent({
               </span>
             </div>
             <span className="block text-sm font-semibold tabular-nums text-[var(--gray-900)]">
-              {formatMetalValue(values[metal.field])} {metal.unit}
+              {formatPreciousMetalContent(metal.key, values[metal.field])}
             </span>
           </li>
         ))}

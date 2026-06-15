@@ -367,3 +367,24 @@ export function formatSilverContent(content: unknown): string {
     return `${value.toFixed(2)} г`;
   }
 }
+
+export type MetalSymbol = "Au" | "Ag" | "Pt" | "Pd";
+
+/** Единица хранения содержания: Au/Pt/Pd — мг, Ag — г */
+export const METAL_CONTENT_UNITS: Record<MetalSymbol, "мг" | "г"> = {
+  Au: "мг",
+  Ag: "г",
+  Pt: "мг",
+  Pd: "мг",
+};
+
+/** Форматирует содержание металла с корректной единицей */
+export function formatPreciousMetalContent(
+  symbol: MetalSymbol,
+  content: unknown
+): string {
+  if (symbol === "Ag") {
+    return formatSilverContent(content);
+  }
+  return formatMetalContent(content);
+}

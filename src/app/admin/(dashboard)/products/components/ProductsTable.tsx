@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { deleteProduct, type ProductWithPrice } from "@/app/actions";
+import { formatPreciousMetalContent } from "@/lib/price-calculator";
 import { Edit, Trash2, Loader2, AlertCircle, Package, Star } from "lucide-react";
 
 interface ProductsTableProps {
@@ -36,10 +37,10 @@ export function ProductsTable({ products }: ProductsTableProps) {
 
   const formatMetalContent = (product: ProductWithPrice) => {
     const metals = [];
-    if (product.contentGold > 0) metals.push(`Au: ${product.contentGold}мг`);
-    if (product.contentSilver > 0) metals.push(`Ag: ${product.contentSilver}г`);
-    if (product.contentPlatinum > 0) metals.push(`Pt: ${product.contentPlatinum}г`);
-    if (product.contentPalladium > 0) metals.push(`Pd: ${product.contentPalladium}г`);
+    if (product.contentGold > 0) metals.push(`Au: ${formatPreciousMetalContent("Au", product.contentGold)}`);
+    if (product.contentSilver > 0) metals.push(`Ag: ${formatPreciousMetalContent("Ag", product.contentSilver)}`);
+    if (product.contentPlatinum > 0) metals.push(`Pt: ${formatPreciousMetalContent("Pt", product.contentPlatinum)}`);
+    if (product.contentPalladium > 0) metals.push(`Pd: ${formatPreciousMetalContent("Pd", product.contentPalladium)}`);
     return metals.length > 0 ? metals.join(", ") : "—";
   };
 

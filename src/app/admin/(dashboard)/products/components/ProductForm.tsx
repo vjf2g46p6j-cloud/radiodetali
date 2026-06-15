@@ -973,8 +973,8 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                           {[
                             { key: "contentAu" as const, symbol: "Au", unit: "мг" },
                             { key: "contentAg" as const, symbol: "Ag", unit: "г" },
-                            { key: "contentPt" as const, symbol: "Pt", unit: "г" },
-                            { key: "contentPd" as const, symbol: "Pd", unit: "г" },
+                            { key: "contentPt" as const, symbol: "Pt", unit: "мг" },
+                            { key: "contentPd" as const, symbol: "Pd", unit: "мг" },
                           ].map((metal) => (
                             <div key={metal.key}>
                               <label className="block text-xs text-slate-500 mb-0.5">
@@ -1001,8 +1001,8 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                             {[
                               { key: "contentAuUsed" as const, symbol: "Au", unit: "мг" },
                               { key: "contentAgUsed" as const, symbol: "Ag", unit: "г" },
-                              { key: "contentPtUsed" as const, symbol: "Pt", unit: "г" },
-                              { key: "contentPdUsed" as const, symbol: "Pd", unit: "г" },
+                              { key: "contentPtUsed" as const, symbol: "Pt", unit: "мг" },
+                              { key: "contentPdUsed" as const, symbol: "Pd", unit: "мг" },
                             ].map((metal) => (
                               <div key={metal.key}>
                                 <label className="block text-xs text-slate-500 mb-0.5">
@@ -1082,8 +1082,8 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                   {[
                     { key: "contentGold" as const, label: "Золото", symbol: "Au", unit: "мг" },
                     { key: "contentSilver" as const, label: "Серебро", symbol: "Ag", unit: "г" },
-                    { key: "contentPlatinum" as const, label: "Платина", symbol: "Pt", unit: "г" },
-                    { key: "contentPalladium" as const, label: "Палладий", symbol: "Pd", unit: "г" },
+                    { key: "contentPlatinum" as const, label: "Платина", symbol: "Pt", unit: "мг" },
+                    { key: "contentPalladium" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
                   ].map((metal) => (
                     <div key={metal.key}>
                       <label
@@ -1157,8 +1157,8 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                     {[
                       { key: "contentGoldUsed" as const, label: "Золото", symbol: "Au", unit: "мг" },
                       { key: "contentSilverUsed" as const, label: "Серебро", symbol: "Ag", unit: "г" },
-                      { key: "contentPlatinumUsed" as const, label: "Платина", symbol: "Pt", unit: "г" },
-                      { key: "contentPalladiumUsed" as const, label: "Палладий", symbol: "Pd", unit: "г" },
+                      { key: "contentPlatinumUsed" as const, label: "Платина", symbol: "Pt", unit: "мг" },
+                      { key: "contentPalladiumUsed" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
                     ].map((metal) => (
                       <div key={metal.key}>
                         <label

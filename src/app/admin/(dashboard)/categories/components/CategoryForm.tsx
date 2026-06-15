@@ -568,7 +568,7 @@ export function CategoryForm({
             </div>
           </div>
 
-          {/* Pt - Платина (г) */}
+          {/* Pt - Платина */}
           <div>
             <label
               htmlFor="cat-customRatePt"
@@ -587,12 +587,12 @@ export function CategoryForm({
                 placeholder="—"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-                ₽/г
+                ₽/мг
               </span>
             </div>
           </div>
 
-          {/* Pd - Палладий (г) */}
+          {/* Pd - Палладий */}
           <div>
             <label
               htmlFor="cat-customRatePd"
@@ -611,7 +611,7 @@ export function CategoryForm({
                 placeholder="—"
               />
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
-                ₽/г
+                ₽/мг
               </span>
             </div>
           </div>
