@@ -49,7 +49,7 @@ export function ProductMetalContent({
   };
 
   const items = PRECIOUS_METAL_LIST.filter(
-    (metal) => values[METAL_FIELDS[metal.symbol]] > 0,
+    (metal) => values[METAL_FIELDS[metal.id]] > 0,
   );
 
   if (items.length === 0) {
@@ -88,14 +88,14 @@ export function ProductMetalContent({
       <ul className={`grid ${gridCols} gap-2 max-w-xl`}>
         {items.map((metal) => (
           <li
-            key={metal.symbol}
+            key={metal.id}
             className="rounded-lg border border-[var(--gray-200)] bg-[var(--gray-50)] px-3 py-2.5"
           >
             <div className="flex items-center gap-1.5 mb-1">
               <span
-                className={`inline-flex items-center justify-center min-w-[1.75rem] px-1.5 py-0.5 rounded text-xs leading-none ${METAL_BADGES[metal.symbol]}`}
+                className={`inline-flex items-center justify-center min-w-[1.75rem] px-1.5 py-0.5 rounded text-xs leading-none ${METAL_BADGES[metal.id]}`}
               >
-                <PeriodicElementSymbol metal={metal.symbol} />
+                <PeriodicElementSymbol metal={metal.id} />
               </span>
               <span className="text-xs font-medium leading-tight text-[var(--gray-700)]">
                 {metal.name}
@@ -103,8 +103,8 @@ export function ProductMetalContent({
             </div>
             <span className="block text-sm font-semibold tabular-nums text-[var(--gray-900)]">
               {formatPreciousMetalContent(
-                metal.symbol,
-                values[METAL_FIELDS[metal.symbol]],
+                metal.id,
+                values[METAL_FIELDS[metal.id]],
               )}
             </span>
           </li>

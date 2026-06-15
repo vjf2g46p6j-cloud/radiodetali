@@ -10,6 +10,7 @@ import {
   type CategoryData,
 } from "@/app/actions";
 import { CategoryBannerEditor } from "./CategoryBannerEditor";
+import { getMetalLabel } from "@/lib/precious-metals";
 import type { CategoryBannerAlign, CategoryBannerTheme } from "@prisma/client";
 import {
   Save,
@@ -631,7 +632,7 @@ export function CategoryForm({
               htmlFor="cat-customRatePt"
               className="block text-sm font-medium text-slate-700 mb-1"
             >
-              Pt (Платина)
+              {getMetalLabel("Pt")}
             </label>
             <div className="relative">
               <input

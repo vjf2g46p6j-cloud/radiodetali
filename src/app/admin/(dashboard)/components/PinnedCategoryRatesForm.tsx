@@ -7,6 +7,7 @@ import {
   type UpdateCategoryRatesInput,
 } from "@/app/actions";
 import { Save, Loader2, CheckCircle, AlertCircle, Pin } from "lucide-react";
+import { getMetalLabel } from "@/lib/precious-metals";
 
 interface PinnedCategoryRatesFormProps {
   categories: CategoryData[];
@@ -183,10 +184,10 @@ export function PinnedCategoryRatesForm({
                 </div>
               </div>
 
-              {/* Pt - Платина */}
+              {/* Pl - Платина */}
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">
-                  Pt (Платина)
+                  {getMetalLabel("Pt")}
                 </label>
                 <div className="relative">
                   <input

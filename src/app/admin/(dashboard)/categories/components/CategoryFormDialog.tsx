@@ -7,6 +7,7 @@ import {
   updateCategory,
   type CategoryData,
 } from "@/app/actions";
+import { getMetalLabel } from "@/lib/precious-metals";
 import {
   Plus,
   X,
@@ -461,7 +462,7 @@ export function CategoryFormDialog({
                       htmlFor="cat-customRatePt"
                       className="block text-sm font-medium text-slate-700 mb-1"
                     >
-                      Pt (Платина)
+                      {getMetalLabel("Pt")}
                     </label>
                     <div className="relative">
                       <input
