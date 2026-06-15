@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { updateMetalRates, type MetalRatesData } from "@/app/actions";
+import { PRECIOUS_METALS } from "@/lib/precious-metals";
 import { Save, Loader2, CheckCircle, AlertCircle } from "lucide-react";
 
 interface MetalRatesFormProps {
@@ -63,7 +64,7 @@ export function MetalRatesForm({ initialRates }: MetalRatesFormProps) {
   const metals = [
     { key: "gold" as const, label: "Золото (Au) — Цена за 1 мг (₽)", symbol: "Au", color: "amber", unit: "₽/мг" },
     { key: "silver" as const, label: "Серебро (Ag) — Цена за 1 г (₽)", symbol: "Ag", color: "slate", unit: "₽/г" },
-    { key: "platinum" as const, label: "Платина (Pt) — Цена за 1 мг (₽)", symbol: "Pt", color: "cyan", unit: "₽/мг" },
+    { key: "platinum" as const, label: `Платина (${PRECIOUS_METALS.Pt.atomicNumber} ${PRECIOUS_METALS.Pt.symbol}) — Цена за 1 мг (₽)`, symbol: PRECIOUS_METALS.Pt.symbol, color: "cyan", unit: "₽/мг" },
     { key: "palladium" as const, label: "Палладий (Pd) — Цена за 1 мг (₽)", symbol: "Pd", color: "violet", unit: "₽/мг" },
   ];
 

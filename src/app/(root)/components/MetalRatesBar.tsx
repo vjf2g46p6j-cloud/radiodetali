@@ -1,5 +1,6 @@
 import { getMetalRates } from "@/app/actions";
 import { TrendingUp } from "lucide-react";
+import { PeriodicElementSymbol } from "./PeriodicElementSymbol";
 
 /**
  * Серверный компонент для отображения курсов металлов
@@ -22,22 +23,22 @@ export async function MetalRatesBar() {
         <span className="text-slate-400 hidden sm:inline">Курсы:</span>
       </span>
       <span className="flex items-center gap-1">
-        <span className="font-semibold text-amber-400">Au</span>
+        <PeriodicElementSymbol metal="Au" className="text-amber-400" />
         <span>{gold.toLocaleString("ru-RU")} ₽</span>
       </span>
       <span className="text-slate-600">•</span>
       <span className="flex items-center gap-1">
-        <span className="font-semibold text-slate-300">Ag</span>
+        <PeriodicElementSymbol metal="Ag" className="text-slate-300" />
         <span>{silver.toLocaleString("ru-RU")} ₽</span>
       </span>
       <span className="text-slate-600">•</span>
       <span className="flex items-center gap-1">
-        <span className="font-semibold text-cyan-300">Pt</span>
+        <PeriodicElementSymbol metal="Pt" className="text-cyan-300" />
         <span>{platinum.toLocaleString("ru-RU")} ₽</span>
       </span>
       <span className="text-slate-600">•</span>
       <span className="flex items-center gap-1">
-        <span className="font-semibold text-rose-300">Pd</span>
+        <PeriodicElementSymbol metal="Pd" className="text-rose-300" />
         <span>{palladium.toLocaleString("ru-RU")} ₽</span>
       </span>
     </>

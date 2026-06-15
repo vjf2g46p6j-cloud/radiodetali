@@ -69,7 +69,7 @@ function BannerHeading({
   if (!titleLines) {
     return (
       <p
-        className={`text-base md:text-lg font-bold leading-snug ${textColor ? "" : titleClass}`}
+        className={`text-sm md:text-base font-semibold leading-snug ${textColor ? "" : titleClass}`}
         style={customTextStyle}
       >
         {heading}
@@ -92,7 +92,7 @@ function BannerHeading({
         <BannerDecorLine color={lineColor} />
       )}
       <p
-        className={`shrink-0 text-base md:text-lg font-bold leading-snug ${
+        className={`shrink-0 text-sm md:text-base font-semibold leading-snug ${
           textColor ? "" : titleClass
         }`}
         style={customTextStyle}
@@ -178,9 +178,9 @@ function CategoryBannerBlock({
 
         {body && (
           <p
-            className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap ${
+            className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium ${
               textColor ? "" : styles.text
-            } ${heading ? "" : "font-medium"}`}
+            }`}
             style={customTextStyle}
           >
             {body}

@@ -2,6 +2,8 @@ import {
   formatPreciousMetalContent,
   type MetalSymbol,
 } from "@/lib/price-calculator";
+import { PRECIOUS_METAL_LIST } from "@/lib/precious-metals";
+import { PeriodicElementSymbol } from "./PeriodicElementSymbol";
 
 interface ProductMetalContentProps {
   categoryName: string;
@@ -13,37 +15,22 @@ interface ProductMetalContentProps {
   variant?: "standalone" | "embedded";
 }
 
-const METALS: {
-  key: MetalSymbol;
-  name: string;
-  field: "contentGold" | "contentSilver" | "contentPlatinum" | "contentPalladium";
-  badge: string;
-}[] = [
-  {
-    key: "Au",
-    name: "Золото",
-    field: "contentGold",
-    badge: "bg-amber-200 text-amber-900",
-  },
-  {
-    key: "Ag",
-    name: "Серебро",
-    field: "contentSilver",
-    badge: "bg-slate-300 text-slate-800",
-  },
-  {
-    key: "Pt",
-    name: "Платина",
-    field: "contentPlatinum",
-    badge: "bg-sky-200 text-sky-900",
-  },
-  {
-    key: "Pd",
-    name: "Палладий",
-    field: "contentPalladium",
-    badge: "bg-violet-200 text-violet-900",
-  },
-];
+const METAL_FIELDS: Record<
+  MetalSymbol,
+  "contentGold" | "contentSilver" | "contentPlatinum" | "contentPalladium"
+> = {
+  Au: "contentGold",
+  Ag: "contentSilver",
+  Pt: "contentPlatinum",
+  Pd: "contentPalladium",
+};
+
+const METAL_BADGES: Record<MetalSymbol, string> = {
+  Au: "bg-amber-200 text-amber-900",
+  Ag: "bg-slate-300 text-slate-800",
+  Pt: "bg-sky-200 text-sky-900",
+  Pd: "bg-violet-200 text-violet-900",
+};
 
 export function ProductMetalContent({
   categoryName,
@@ -61,7 +48,9 @@ export function ProductMetalContent({
     contentPalladium,
   };
 
-  const items = METALS.filter((metal) => values[metal.field] > 0);
+  const items = PRECIOUS_METAL_LIST.filter(
+    (metal) => values[METAL_FIELDS[metal.symbol]] > 0,
+  );
 
   if (items.length === 0) {
     return null;
@@ -99,21 +88,24 @@ export function ProductMetalContent({
       <ul className={`grid ${gridCols} gap-2 max-w-xl`}>
         {items.map((metal) => (
           <li
-            key={metal.key}
+            key={metal.symbol}
             className="rounded-lg border border-[var(--gray-200)] bg-[var(--gray-50)] px-3 py-2.5"
           >
             <div className="flex items-center gap-1.5 mb-1">
               <span
-                className={`inline-flex items-center justify-center min-w-[1.75rem] px-1.5 py-0.5 rounded text-xs font-bold leading-none ${metal.badge}`}
+                className={`inline-flex items-center justify-center min-w-[1.75rem] px-1.5 py-0.5 rounded text-xs leading-none ${METAL_BADGES[metal.symbol]}`}
               >
-                {metal.key}
+                <PeriodicElementSymbol metal={metal.symbol} />
               </span>
               <span className="text-xs font-medium leading-tight text-[var(--gray-700)]">
                 {metal.name}
               </span>
             </div>
             <span className="block text-sm font-semibold tabular-nums text-[var(--gray-900)]">
-              {formatPreciousMetalContent(metal.key, values[metal.field])}
+              {formatPreciousMetalContent(
+                metal.symbol,
+                values[METAL_FIELDS[metal.symbol]],
+              )}
             </span>
           </li>
         ))}

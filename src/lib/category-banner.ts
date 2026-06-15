@@ -116,32 +116,35 @@ export function resolveCategoryBannerContent(
   return null;
 }
 
-/** Заголовок с линиями: отдельное поле или первая строка текста */
+/** Заголовок с линиями: только явный bannerTitle или первая строка (если есть перенос) */
 export function resolveBannerDisplay(
   content: { title: string | null; text: string } | null,
   titleLines: boolean,
 ): { heading: string | null; body: string } | null {
   if (!content) return null;
 
-  if (content.title?.trim()) {
+  const title = content.title?.trim() || null;
+  const text = content.text;
+
+  if (title) {
     return {
-      heading: content.title.trim(),
-      body: content.text,
+      heading: title,
+      body: text,
     };
   }
 
-  if (titleLines && content.text.trim()) {
-    const nl = content.text.indexOf("\n");
+  if (titleLines) {
+    const nl = text.indexOf("\n");
     if (nl > -1) {
-      return {
-        heading: content.text.slice(0, nl).trim(),
-        body: content.text.slice(nl + 1).trim(),
-      };
+      const heading = text.slice(0, nl).trim();
+      const body = text.slice(nl + 1).trim();
+      if (heading) {
+        return { heading, body };
+      }
     }
-    return { heading: content.text.trim(), body: "" };
   }
 
-  return { heading: null, body: content.text };
+  return { heading: null, body: text };
 }
 
 export function getBannerAlignClasses(align: CategoryBannerAlign): {

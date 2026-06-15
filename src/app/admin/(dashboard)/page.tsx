@@ -1,4 +1,5 @@
 import { getMetalRates, getProducts, getPinnedCategories, getGlobalSettings } from "@/app/actions";
+import { PRECIOUS_METALS } from "@/lib/precious-metals";
 import { MetalRatesForm } from "./components/MetalRatesForm";
 import { PinnedCategoryRatesForm } from "./components/PinnedCategoryRatesForm";
 import { ContactSettingsForm } from "./components/ContactSettingsForm";
@@ -55,7 +56,7 @@ export default async function AdminDashboard() {
         />
         <StatCard
           icon={<TrendingUp className="w-6 h-6" />}
-          label="Платина (Pt)"
+          label={`Платина (${PRECIOUS_METALS.Pt.atomicNumber} ${PRECIOUS_METALS.Pt.symbol})`}
           value={rates ? `${rates.platinum.toLocaleString("ru-RU")} ₽/мг` : "—"}
           color="cyan"
         />
