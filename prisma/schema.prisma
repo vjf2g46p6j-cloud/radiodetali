@@ -107,7 +107,8 @@ model Product {
   id          String   @id @default(cuid())
   name        String
   slug        String   @unique
-  description String?  @db.Text // Краткое описание товара (2-3 предложения)
+  description     String?  @db.Text // Краткое описание для карточки товара (2-3 предложения)
+  pageDescription String?  @db.Text // Полное описание на странице товара
   image       String?  // URL изображения
   categoryId  String
   sortOrder   Int      @default(0) // Поле для ручной сортировки (меньше = выше)
@@ -134,6 +135,16 @@ model Product {
   contentSilverUsed    Decimal @default(0) @db.Decimal(18, 10)
   contentPlatinumUsed  Decimal @default(0) @db.Decimal(18, 10)
   contentPalladiumUsed Decimal @default(0) @db.Decimal(18, 10)
+
+  // Содержание для отображения на странице товара (не влияет на цену)
+  displayContentGold      Decimal @default(0) @db.Decimal(18, 10)
+  displayContentSilver    Decimal @default(0) @db.Decimal(18, 10)
+  displayContentPlatinum  Decimal @default(0) @db.Decimal(18, 10)
+  displayContentPalladium Decimal @default(0) @db.Decimal(18, 10)
+  // false = значения отображения синхронизируются с расчётным содержанием
+  displayContentCustomized Boolean @default(false)
+  // Показывать блок содержания на странице товара
+  showDisplayContent       Boolean @default(true)
 
   // Настройки доступности по состоянию (Новое / Б/У)
   isNewAvailable  Boolean @default(true) // Принимаем "Новое"

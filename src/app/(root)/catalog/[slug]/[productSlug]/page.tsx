@@ -240,7 +240,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <>
       <ProductSchema
         name={product.seoH1 || product.name}
-        description={product.description}
+        description={product.pageDescription}
         image={product.image}
         price={displayPrice}
         categorySlug={categorySlug}

@@ -66,6 +66,7 @@ export interface ProductWithPrice {
   name: string;
   slug: string;
   description: string | null;
+  pageDescription: string | null;
   image: string | null;
   seoH1: string | null;
   seoDescription: string | null;
@@ -99,6 +100,13 @@ export interface ProductWithPrice {
   contentSilverUsed: number;
   contentPlatinumUsed: number;
   contentPalladiumUsed: number;
+  // Содержание для отображения на странице товара (не влияет на цену)
+  displayContentGold: number;
+  displayContentSilver: number;
+  displayContentPlatinum: number;
+  displayContentPalladium: number;
+  displayContentCustomized: boolean;
+  showDisplayContent: boolean;
   // Настройки доступности по состоянию
   isNewAvailable: boolean;
   isUsedAvailable: boolean;
@@ -121,6 +129,7 @@ export interface CreateProductInput {
   name: string;
   slug: string;
   description?: string | null;
+  pageDescription?: string | null;
   image?: string | null;
   seoH1?: string | null;
   seoDescription?: string | null;
@@ -148,6 +157,13 @@ export interface CreateProductInput {
   contentSilverUsed?: number;
   contentPlatinumUsed?: number;
   contentPalladiumUsed?: number;
+  // Содержание для отображения на странице
+  displayContentGold?: number;
+  displayContentSilver?: number;
+  displayContentPlatinum?: number;
+  displayContentPalladium?: number;
+  displayContentCustomized?: boolean;
+  showDisplayContent?: boolean;
   isNewAvailable?: boolean;
   isUsedAvailable?: boolean;
   manualPriceNew?: number | null;
@@ -162,6 +178,7 @@ export interface UpdateProductInput {
   name?: string;
   slug?: string;
   description?: string | null;
+  pageDescription?: string | null;
   image?: string | null;
   seoH1?: string | null;
   seoDescription?: string | null;
@@ -189,6 +206,13 @@ export interface UpdateProductInput {
   contentSilverUsed?: number;
   contentPlatinumUsed?: number;
   contentPalladiumUsed?: number;
+  // Содержание для отображения на странице
+  displayContentGold?: number;
+  displayContentSilver?: number;
+  displayContentPlatinum?: number;
+  displayContentPalladium?: number;
+  displayContentCustomized?: boolean;
+  showDisplayContent?: boolean;
   isNewAvailable?: boolean;
   isUsedAvailable?: boolean;
   manualPriceNew?: number | null;
@@ -226,6 +250,7 @@ interface DbProductWithCategory {
   name: string;
   slug: string;
   description: string | null;
+  pageDescription: string | null;
   image: string | null;
   categoryId: string;
   category: {
@@ -272,6 +297,12 @@ interface DbProductWithCategory {
   contentSilverUsed: unknown;
   contentPlatinumUsed: unknown;
   contentPalladiumUsed: unknown;
+  displayContentGold: unknown;
+  displayContentSilver: unknown;
+  displayContentPlatinum: unknown;
+  displayContentPalladium: unknown;
+  displayContentCustomized: boolean;
+  showDisplayContent: boolean;
   isNewAvailable: boolean;
   isUsedAvailable: boolean;
   manualPriceNew: unknown | null;
@@ -306,6 +337,153 @@ function toNumber(value: unknown): number {
  */
 function toNumberOrNull(value: unknown): number | null {
   return value !== null && value !== undefined ? Number(value) : null;
+}
+
+function normalizeMetalInput(value: number | null | undefined): number {
+  return value == null || Number.isNaN(value) ? 0 : value;
+}
+
+function hasAnyMetalContent(
+  gold: number,
+  silver: number,
+  platinum: number,
+  palladium: number,
+): boolean {
+  return gold > 0 || silver > 0 || platinum > 0 || palladium > 0;
+}
+
+function hasFixedManualPrice(input: {
+  manualPriceNew?: number | null;
+  manualPriceUsed?: number | null;
+}): boolean {
+  const priceNew = input.manualPriceNew;
+  const priceUsed = input.manualPriceUsed;
+  return (
+    (priceNew != null && !Number.isNaN(priceNew) && priceNew > 0) ||
+    (priceUsed != null && !Number.isNaN(priceUsed) && priceUsed > 0)
+  );
+}
+
+/**
+ * Содержание для отображения на сайте.
+ * Если не кастомизировано и в БД пусто — подставляем расчётное (для цен).
+ */
+function resolveDisplayMetalContent(product: {
+  contentGold: unknown;
+  contentSilver: unknown;
+  contentPlatinum: unknown;
+  contentPalladium: unknown;
+  displayContentGold: unknown;
+  displayContentSilver: unknown;
+  displayContentPlatinum: unknown;
+  displayContentPalladium: unknown;
+  displayContentCustomized: boolean;
+  manualPriceNew: unknown | null;
+  manualPriceUsed: unknown | null;
+}) {
+  const pricing = {
+    gold: toNumber(product.contentGold),
+    silver: toNumber(product.contentSilver),
+    platinum: toNumber(product.contentPlatinum),
+    palladium: toNumber(product.contentPalladium),
+  };
+  const stored = {
+    gold: toNumber(product.displayContentGold),
+    silver: toNumber(product.displayContentSilver),
+    platinum: toNumber(product.displayContentPlatinum),
+    palladium: toNumber(product.displayContentPalladium),
+  };
+
+  if (product.displayContentCustomized) {
+    return stored;
+  }
+
+  if (hasAnyMetalContent(stored.gold, stored.silver, stored.platinum, stored.palladium)) {
+    return stored;
+  }
+
+  // Фиксированная цена: расчётное содержание может быть пустым — не затираем отображение
+  if (
+    hasFixedManualPrice({
+      manualPriceNew: toNumberOrNull(product.manualPriceNew),
+      manualPriceUsed: toNumberOrNull(product.manualPriceUsed),
+    })
+  ) {
+    return stored;
+  }
+
+  return pricing;
+}
+
+/** При сохранении: если не кастомизировано — копируем расчётное в отображаемое */
+function buildDisplayContentForSave(input: {
+  contentGold?: number;
+  contentSilver?: number;
+  contentPlatinum?: number;
+  contentPalladium?: number;
+  displayContentGold?: number;
+  displayContentSilver?: number;
+  displayContentPlatinum?: number;
+  displayContentPalladium?: number;
+  displayContentCustomized?: boolean;
+  manualPriceNew?: number | null;
+  manualPriceUsed?: number | null;
+}) {
+  const display = {
+    gold: normalizeMetalInput(input.displayContentGold),
+    silver: normalizeMetalInput(input.displayContentSilver),
+    platinum: normalizeMetalInput(input.displayContentPlatinum),
+    palladium: normalizeMetalInput(input.displayContentPalladium),
+  };
+  const pricing = {
+    gold: normalizeMetalInput(input.contentGold),
+    silver: normalizeMetalInput(input.contentSilver),
+    platinum: normalizeMetalInput(input.contentPlatinum),
+    palladium: normalizeMetalInput(input.contentPalladium),
+  };
+
+  if (input.displayContentCustomized) {
+    return {
+      displayContentGold: display.gold,
+      displayContentSilver: display.silver,
+      displayContentPlatinum: display.platinum,
+      displayContentPalladium: display.palladium,
+      displayContentCustomized: true as const,
+    };
+  }
+
+  const fixedPrice = hasFixedManualPrice(input);
+  const pricingHasContent = hasAnyMetalContent(
+    pricing.gold,
+    pricing.silver,
+    pricing.platinum,
+    pricing.palladium,
+  );
+  const displayHasContent = hasAnyMetalContent(
+    display.gold,
+    display.silver,
+    display.platinum,
+    display.palladium,
+  );
+
+  // Фиксированная цена без расчётного содержания — сохраняем только отображаемое
+  if (fixedPrice && !pricingHasContent) {
+    return {
+      displayContentGold: display.gold,
+      displayContentSilver: display.silver,
+      displayContentPlatinum: display.platinum,
+      displayContentPalladium: display.palladium,
+      displayContentCustomized: displayHasContent,
+    };
+  }
+
+  return {
+    displayContentGold: pricing.gold,
+    displayContentSilver: pricing.silver,
+    displayContentPlatinum: pricing.platinum,
+    displayContentPalladium: pricing.palladium,
+    displayContentCustomized: false as const,
+  };
 }
 
 /**
@@ -390,6 +568,7 @@ function serializeProduct(
     name: product.name,
     slug: product.slug,
     description: product.description,
+    pageDescription: product.pageDescription ?? null,
     image: product.image,
     seoH1: product.seoH1 ?? null,
     seoDescription: product.seoDescription ?? null,
@@ -414,6 +593,17 @@ function serializeProduct(
     contentSilverUsed: toNumber(product.contentSilverUsed),
     contentPlatinumUsed: toNumber(product.contentPlatinumUsed),
     contentPalladiumUsed: toNumber(product.contentPalladiumUsed),
+    ...(() => {
+      const display = resolveDisplayMetalContent(product);
+      return {
+        displayContentGold: display.gold,
+        displayContentSilver: display.silver,
+        displayContentPlatinum: display.platinum,
+        displayContentPalladium: display.palladium,
+      };
+    })(),
+    displayContentCustomized: product.displayContentCustomized,
+    showDisplayContent: product.showDisplayContent,
     isNewAvailable: product.isNewAvailable,
     isUsedAvailable: product.isUsedAvailable,
     manualPriceNew: toNumberOrNull(product.manualPriceNew),
@@ -681,13 +871,17 @@ export async function getProducts(
         ...product,
         // Объединяем Название + Slug (маркировка) без пробелов/спецсимволов
         normalizedSearchString: stripToAlphanumeric(
-          product.name + ' ' + product.slug + (product.description ? ' ' + product.description : '')
+          product.name +
+            ' ' +
+            product.slug +
+            (product.description ? ' ' + product.description : '') +
+            (product.pageDescription ? ' ' + product.pageDescription : '')
         ),
         nameNormalized: stripToAlphanumeric(product.name),
         slugNormalized: stripToAlphanumeric(product.slug),
-        descriptionNormalized: product.description
-          ? stripToAlphanumeric(product.description)
-          : '',
+        descriptionNormalized: stripToAlphanumeric(
+          [product.description, product.pageDescription].filter(Boolean).join(' ')
+        ),
       }));
 
       // Настройка Fuse.js
@@ -986,6 +1180,7 @@ export async function createProduct(
         name: input.name.trim(),
         slug: input.slug.trim(),
         description: input.description ?? null,
+        pageDescription: input.pageDescription ?? null,
         image: input.image ?? null,
         seoH1: input.seoH1 ?? null,
         seoDescription: input.seoDescription ?? null,
@@ -1029,6 +1224,8 @@ export async function createProduct(
         contentSilverUsed: (input.contentSilverUsed == null || Number.isNaN(input.contentSilverUsed)) ? 0 : input.contentSilverUsed,
         contentPlatinumUsed: (input.contentPlatinumUsed == null || Number.isNaN(input.contentPlatinumUsed)) ? 0 : input.contentPlatinumUsed,
         contentPalladiumUsed: (input.contentPalladiumUsed == null || Number.isNaN(input.contentPalladiumUsed)) ? 0 : input.contentPalladiumUsed,
+        ...buildDisplayContentForSave(input),
+        showDisplayContent: input.showDisplayContent ?? true,
         isNewAvailable: input.isNewAvailable ?? true,
         isUsedAvailable: input.isUsedAvailable ?? true,
         manualPriceNew: input.manualPriceNew ?? null,
@@ -1126,6 +1323,7 @@ export async function updateProduct(
     if (input.name !== undefined) updateData.name = input.name.trim();
     if (input.slug !== undefined) updateData.slug = input.slug.trim();
     if (input.description !== undefined) updateData.description = input.description;
+    if (input.pageDescription !== undefined) updateData.pageDescription = input.pageDescription;
     if (input.image !== undefined) updateData.image = input.image;
     if (input.seoH1 !== undefined) updateData.seoH1 = input.seoH1 ?? null;
     if (input.seoDescription !== undefined) updateData.seoDescription = input.seoDescription ?? null;
@@ -1151,6 +1349,70 @@ export async function updateProduct(
     if (input.contentSilverUsed !== undefined) updateData.contentSilverUsed = (input.contentSilverUsed == null || Number.isNaN(input.contentSilverUsed)) ? 0 : input.contentSilverUsed;
     if (input.contentPlatinumUsed !== undefined) updateData.contentPlatinumUsed = (input.contentPlatinumUsed == null || Number.isNaN(input.contentPlatinumUsed)) ? 0 : input.contentPlatinumUsed;
     if (input.contentPalladiumUsed !== undefined) updateData.contentPalladiumUsed = (input.contentPalladiumUsed == null || Number.isNaN(input.contentPalladiumUsed)) ? 0 : input.contentPalladiumUsed;
+
+    if (input.showDisplayContent !== undefined) updateData.showDisplayContent = input.showDisplayContent;
+
+    const shouldSyncDisplay =
+      input.displayContentCustomized !== undefined ||
+      input.displayContentGold !== undefined ||
+      input.displayContentSilver !== undefined ||
+      input.displayContentPlatinum !== undefined ||
+      input.displayContentPalladium !== undefined ||
+      input.contentGold !== undefined ||
+      input.contentSilver !== undefined ||
+      input.contentPlatinum !== undefined ||
+      input.contentPalladium !== undefined;
+
+    if (shouldSyncDisplay) {
+      Object.assign(
+        updateData,
+        buildDisplayContentForSave({
+          contentGold:
+            input.contentGold !== undefined
+              ? normalizeMetalInput(input.contentGold)
+              : toNumber(existingProduct.contentGold),
+          contentSilver:
+            input.contentSilver !== undefined
+              ? normalizeMetalInput(input.contentSilver)
+              : toNumber(existingProduct.contentSilver),
+          contentPlatinum:
+            input.contentPlatinum !== undefined
+              ? normalizeMetalInput(input.contentPlatinum)
+              : toNumber(existingProduct.contentPlatinum),
+          contentPalladium:
+            input.contentPalladium !== undefined
+              ? normalizeMetalInput(input.contentPalladium)
+              : toNumber(existingProduct.contentPalladium),
+          displayContentGold:
+            input.displayContentGold !== undefined
+              ? input.displayContentGold
+              : toNumber(existingProduct.displayContentGold),
+          displayContentSilver:
+            input.displayContentSilver !== undefined
+              ? input.displayContentSilver
+              : toNumber(existingProduct.displayContentSilver),
+          displayContentPlatinum:
+            input.displayContentPlatinum !== undefined
+              ? input.displayContentPlatinum
+              : toNumber(existingProduct.displayContentPlatinum),
+          displayContentPalladium:
+            input.displayContentPalladium !== undefined
+              ? input.displayContentPalladium
+              : toNumber(existingProduct.displayContentPalladium),
+          displayContentCustomized:
+            input.displayContentCustomized ?? existingProduct.displayContentCustomized,
+          manualPriceNew:
+            input.manualPriceNew !== undefined
+              ? input.manualPriceNew
+              : toNumberOrNull(existingProduct.manualPriceNew),
+          manualPriceUsed:
+            input.manualPriceUsed !== undefined
+              ? input.manualPriceUsed
+              : toNumberOrNull(existingProduct.manualPriceUsed),
+        }),
+      );
+    }
+
     if (input.isNewAvailable !== undefined) updateData.isNewAvailable = input.isNewAvailable;
     if (input.isUsedAvailable !== undefined) updateData.isUsedAvailable = input.isUsedAvailable;
     if (input.manualPriceNew !== undefined) updateData.manualPriceNew = input.manualPriceNew;

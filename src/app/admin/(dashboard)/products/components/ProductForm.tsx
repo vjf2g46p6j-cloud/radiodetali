@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useTransition, useRef, useMemo } from "react";
+import { useState, useTransition, useRef, useMemo, useEffect } from "react";
 import { useForm, useFieldArray } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import {
@@ -28,6 +28,13 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 
+const DISPLAY_METAL_FIELDS = [
+  { key: "displayContentGold" as const, label: "Золото", symbol: "Au", unit: "мг" },
+  { key: "displayContentSilver" as const, label: "Серебро", symbol: "Ag", unit: "г" },
+  { key: "displayContentPlatinum" as const, label: "Платина", symbol: "Pt", unit: "мг" },
+  { key: "displayContentPalladium" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
+];
+
 interface ProductFormProps {
   product?: ProductWithPrice;
   categories: CategoryData[];
@@ -41,6 +48,7 @@ interface FormData {
   name: string;
   slug: string;
   description: string;
+  pageDescription: string;
   image: string;
   seoH1: string;
   seoDescription: string;
@@ -64,6 +72,12 @@ interface FormData {
   contentSilverUsed: number;
   contentPlatinumUsed: number;
   contentPalladiumUsed: number;
+  displayContentGold: number;
+  displayContentSilver: number;
+  displayContentPlatinum: number;
+  displayContentPalladium: number;
+  displayContentCustomized: boolean;
+  showDisplayContent: boolean;
   isNewAvailable: boolean;
   isUsedAvailable: boolean;
   manualPriceNew: number | null;
@@ -113,6 +127,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
   const [imageUrl, setImageUrl] = useState(product?.image || "");
   const [isUploading, setIsUploading] = useState(false);
   const [hasDescription, setHasDescription] = useState(!!(product?.description));
+  const [hasPageDescription, setHasPageDescription] = useState(!!(product?.pageDescription));
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isEditing = !!product;
@@ -131,6 +146,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
       name: product?.name || "",
       slug: product?.slug || "",
       description: product?.description || "",
+      pageDescription: product?.pageDescription || "",
       image: product?.image || "",
       seoH1: product?.seoH1 || "",
       seoDescription: product?.seoDescription || "",
@@ -154,6 +170,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
       contentSilverUsed: product?.contentSilverUsed || 0,
       contentPlatinumUsed: product?.contentPlatinumUsed || 0,
       contentPalladiumUsed: product?.contentPalladiumUsed || 0,
+      displayContentGold: product?.displayContentGold ?? product?.contentGold ?? 0,
+      displayContentSilver: product?.displayContentSilver ?? product?.contentSilver ?? 0,
+      displayContentPlatinum: product?.displayContentPlatinum ?? product?.contentPlatinum ?? 0,
+      displayContentPalladium: product?.displayContentPalladium ?? product?.contentPalladium ?? 0,
+      displayContentCustomized: product?.displayContentCustomized ?? false,
+      showDisplayContent: product?.showDisplayContent ?? true,
       isNewAvailable: product?.isNewAvailable ?? true,
       isUsedAvailable: product?.isUsedAvailable ?? true,
       manualPriceNew: product?.manualPriceNew || null,
@@ -208,6 +230,43 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
   const watchContentSilverUsed = watch("contentSilverUsed");
   const watchContentPlatinumUsed = watch("contentPlatinumUsed");
   const watchContentPalladiumUsed = watch("contentPalladiumUsed");
+  const watchDisplayContentCustomized = watch("displayContentCustomized");
+  const watchManualPriceNew = watch("manualPriceNew");
+  const watchManualPriceUsed = watch("manualPriceUsed");
+
+  const hasFixedPrice =
+    (watchManualPriceNew != null &&
+      !Number.isNaN(watchManualPriceNew) &&
+      watchManualPriceNew > 0) ||
+    (watchManualPriceUsed != null &&
+      !Number.isNaN(watchManualPriceUsed) &&
+      watchManualPriceUsed > 0);
+
+  // Синхронизация отображаемого содержания с расчётным (пока не изменено вручную)
+  useEffect(() => {
+    if (watchHasModifications || watchDisplayContentCustomized || hasFixedPrice) return;
+    setValue("displayContentGold", watchContentGold ?? 0);
+    setValue("displayContentSilver", watchContentSilver ?? 0);
+    setValue("displayContentPlatinum", watchContentPlatinum ?? 0);
+    setValue("displayContentPalladium", watchContentPalladium ?? 0);
+  }, [
+    watchContentGold,
+    watchContentSilver,
+    watchContentPlatinum,
+    watchContentPalladium,
+    watchDisplayContentCustomized,
+    watchHasModifications,
+    hasFixedPrice,
+    setValue,
+  ]);
+
+  const syncDisplayFromPricing = () => {
+    setValue("displayContentGold", watchContentGold ?? 0);
+    setValue("displayContentSilver", watchContentSilver ?? 0);
+    setValue("displayContentPlatinum", watchContentPlatinum ?? 0);
+    setValue("displayContentPalladium", watchContentPalladium ?? 0);
+    setValue("displayContentCustomized", false);
+  };
 
   // Получаем выбранную категорию для определения кастомных курсов
   const selectedCategory = useMemo(() => {
@@ -356,6 +415,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           name: data.name,
           slug: data.slug,
           description: hasDescription ? data.description || null : null,
+          pageDescription: hasPageDescription ? data.pageDescription || null : null,
           image: data.image || null,
           seoH1: data.seoH1 || null,
           seoDescription: data.seoDescription || null,
@@ -378,6 +438,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           contentSilverUsed: data.contentSilverUsed,
           contentPlatinumUsed: data.contentPlatinumUsed,
           contentPalladiumUsed: data.contentPalladiumUsed,
+          displayContentGold: data.displayContentGold,
+          displayContentSilver: data.displayContentSilver,
+          displayContentPlatinum: data.displayContentPlatinum,
+          displayContentPalladium: data.displayContentPalladium,
+          displayContentCustomized: data.displayContentCustomized,
+          showDisplayContent: data.showDisplayContent,
           isNewAvailable,
           isUsedAvailable,
           manualPriceNew: data.manualPriceNew,
@@ -388,6 +454,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           name: data.name,
           slug: data.slug,
           description: hasDescription ? data.description || null : null,
+          pageDescription: hasPageDescription ? data.pageDescription || null : null,
           image: data.image || null,
           seoH1: data.seoH1 || null,
           seoDescription: data.seoDescription || null,
@@ -410,6 +477,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           contentSilverUsed: data.contentSilverUsed,
           contentPlatinumUsed: data.contentPlatinumUsed,
           contentPalladiumUsed: data.contentPalladiumUsed,
+          displayContentGold: data.displayContentGold,
+          displayContentSilver: data.displayContentSilver,
+          displayContentPlatinum: data.displayContentPlatinum,
+          displayContentPalladium: data.displayContentPalladium,
+          displayContentCustomized: data.displayContentCustomized,
+          showDisplayContent: data.showDisplayContent,
           isNewAvailable,
           isUsedAvailable,
           manualPriceNew: data.manualPriceNew,
@@ -529,7 +602,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                 )}
               </div>
 
-              {/* Description */}
+              {/* Описание для карточки */}
               <div>
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
@@ -544,7 +617,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                     className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
                   />
                   <span className="text-sm font-medium text-slate-700">
-                    Добавить описание
+                    Описание для карточки
                   </span>
                 </label>
                 {hasDescription && (
@@ -554,10 +627,44 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                       {...register("description")}
                       rows={3}
                       className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none"
-                      placeholder="Краткое описание товара (2-3 предложения)"
+                      placeholder="Краткое описание (2-3 предложения)"
                     />
                     <p className="mt-1 text-xs text-slate-500">
-                      Описание отобразится на карточке товара
+                      Отображается в каталоге на карточке товара
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Описание для страницы товара */}
+              <div>
+                <label className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={hasPageDescription}
+                    onChange={(e) => {
+                      setHasPageDescription(e.target.checked);
+                      if (!e.target.checked) {
+                        setValue("pageDescription", "");
+                      }
+                    }}
+                    className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <span className="text-sm font-medium text-slate-700">
+                    Описание для страницы товара
+                  </span>
+                </label>
+                {hasPageDescription && (
+                  <div className="mt-2">
+                    <textarea
+                      id="pageDescription"
+                      {...register("pageDescription")}
+                      rows={6}
+                      className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y min-h-[8rem]"
+                      placeholder="Подробное описание для страницы товара"
+                    />
+                    <p className="mt-1 text-xs text-slate-500">
+                      Отображается на индивидуальной странице товара в блоке «Описание»
                     </p>
                   </div>
                 )}
@@ -1054,9 +1161,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           {/* Metal content - NEW and USED in two columns */}
           {!watchHasModifications && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
-            <h2 className="text-lg font-semibold text-slate-800 mb-6">
-              Содержание металлов ({contentSuffix})
+            <h2 className="text-lg font-semibold text-slate-800 mb-2">
+              Содержание для расчёта цены ({contentSuffix})
             </h2>
+            <p className="text-sm text-slate-500 mb-6">
+              Используется для автоматического расчёта цен. Не отображается на сайте.
+            </p>
 
             <div className={`grid grid-cols-1 ${watchIsSingleType ? "" : "md:grid-cols-2"} gap-6`}>
               {/* Содержание в НОВОМ */}
@@ -1216,6 +1326,91 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
             </div>
           </div>
           )}
+
+          {/* Display metal content — always visible */}
+          <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+              <div className="flex-1">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <h2 className="text-lg font-semibold text-slate-800">
+                    Содержание для отображения на сайте
+                  </h2>
+                  <label className="flex items-center gap-2 cursor-pointer shrink-0">
+                    <input
+                      type="checkbox"
+                      {...register("showDisplayContent")}
+                      className="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                    />
+                    <span className="text-sm font-medium text-slate-700">
+                      Показывать на странице товара
+                    </span>
+                  </label>
+                </div>
+                <p className="text-sm text-slate-500 mt-1">
+                  {watch("showDisplayContent")
+                    ? hasFixedPrice
+                      ? "Товар с фиксированной ценой — задайте содержание для отображения вручную. На цену не влияет."
+                      : "Блок виден покупателям. Не влияет на цены."
+                    : "Блок скрыт на сайте — данные сохраняются в админке."}
+                  {watch("showDisplayContent") &&
+                    !hasFixedPrice &&
+                    !watchDisplayContentCustomized &&
+                    !watchHasModifications && (
+                      <span className="text-indigo-600"> Синхронизировано с расчётным.</span>
+                    )}
+                </p>
+              </div>
+              {!watchHasModifications && !hasFixedPrice && (
+                <button
+                  type="button"
+                  onClick={syncDisplayFromPricing}
+                  className="shrink-0 px-3 py-1.5 text-sm font-medium text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg transition-colors"
+                >
+                  Подтянуть из расчётного
+                </button>
+              )}
+            </div>
+
+            <div className="p-4 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {DISPLAY_METAL_FIELDS.map((metal) => (
+                  <div key={metal.key}>
+                    <label
+                      htmlFor={metal.key}
+                      className="block text-xs font-medium text-slate-600 mb-1"
+                    >
+                      {metal.label} {metal.symbol} ({metal.unit})
+                    </label>
+                    <div className="relative">
+                      <div className="absolute left-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded bg-slate-200 flex items-center justify-center">
+                        <span className="text-xs font-bold text-slate-700">
+                          {metal.symbol}
+                        </span>
+                      </div>
+                      <input
+                        type="number"
+                        id={metal.key}
+                        step="any"
+                        min="0"
+                        {...register(metal.key, {
+                          valueAsNumber: true,
+                          min: 0,
+                          onChange: () => {
+                            setValue("displayContentCustomized", true);
+                          },
+                        })}
+                        className="w-full pl-11 pr-14 py-2 text-sm rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 bg-white"
+                        placeholder="0"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-xs">
+                        {metal.unit}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
 
           {/* Pricing - Manual prices */}
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">

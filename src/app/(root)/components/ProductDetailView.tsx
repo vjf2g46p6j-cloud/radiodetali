@@ -192,10 +192,13 @@ export function ProductDetailView({
   sellContactInfo,
 }: ProductDetailViewProps) {
   const hasMetalContent =
-    product.contentGold > 0 ||
-    product.contentSilver > 0 ||
-    product.contentPlatinum > 0 ||
-    product.contentPalladium > 0;
+    product.showDisplayContent &&
+    (product.displayContentGold > 0 ||
+      product.displayContentSilver > 0 ||
+      product.displayContentPlatinum > 0 ||
+      product.displayContentPalladium > 0);
+
+  const hasPageDescription = !!product.pageDescription;
 
   const howToSellSteps = [
     "Соберите все детали данного типа",
@@ -274,32 +277,32 @@ export function ProductDetailView({
         </div>
       </div>
 
-      {/* Детали: единый блок */}
+      {/* Детали: описание → содержание → как сдать */}
       <div className="rounded-2xl border border-[var(--gray-200)] bg-white shadow-sm overflow-hidden">
-        {hasMetalContent && (
+        {hasPageDescription && (
           <section className="p-5 sm:p-6 border-b border-[var(--gray-100)]">
-            <ProductMetalContent
-              variant="embedded"
-              categoryName={categoryName}
-              productName={product.name}
-              contentGold={product.contentGold}
-              contentSilver={product.contentSilver}
-              contentPlatinum={product.contentPlatinum}
-              contentPalladium={product.contentPalladium}
-            />
-          </section>
-        )}
-
-        {product.description && (
-          <section
-            className={`p-5 sm:p-6 ${hasMetalContent ? "border-b border-[var(--gray-100)]" : ""}`}
-          >
             <h2 className="text-base font-semibold text-[var(--gray-900)] mb-3">
               Описание
             </h2>
             <p className="text-[var(--gray-700)] text-sm sm:text-base leading-relaxed whitespace-pre-wrap">
-              {product.description}
+              {product.pageDescription}
             </p>
+          </section>
+        )}
+
+        {hasMetalContent && (
+          <section
+            className={`p-5 sm:p-6 ${hasPageDescription ? "border-b border-[var(--gray-100)]" : ""}`}
+          >
+            <ProductMetalContent
+              variant="embedded"
+              categoryName={categoryName}
+              productName={product.name}
+              contentGold={product.displayContentGold}
+              contentSilver={product.displayContentSilver}
+              contentPlatinum={product.displayContentPlatinum}
+              contentPalladium={product.displayContentPalladium}
+            />
           </section>
         )}
 

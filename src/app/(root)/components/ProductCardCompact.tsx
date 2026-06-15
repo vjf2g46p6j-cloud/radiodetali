@@ -158,7 +158,7 @@ export function ProductCardCompact({ product, categorySlug, contactInfo }: Produ
 
           {/* Description */}
           {product.description && (
-            <p className="text-sm font-medium text-[var(--gray-900)] mb-5 line-clamp-2">
+            <p className="text-sm text-[var(--gray-500)] mb-5 line-clamp-2">
               {product.description}
             </p>
           )}
