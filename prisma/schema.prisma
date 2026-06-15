@@ -61,6 +61,20 @@ model MetalRate {
   @@map("metal_rates")
 }
 
+enum CategoryBannerAlign {
+  LEFT
+  CENTER
+  RIGHT
+}
+
+enum CategoryBannerTheme {
+  SOFT
+  BRAND
+  ACCENT
+  NOTICE
+  IMAGE
+}
+
 // Модель категории с древовидной структурой (self-referencing)
 model Category {
   id             String  @id @default(cuid())
@@ -71,6 +85,17 @@ model Category {
   sortOrder      Int     @default(0) // Поле для сортировки на странице /catalog (корневые категории)
   childSortOrder Int     @default(0) // Позиция родительской категории среди своих подкатегорий для отображения товаров
   warningMessage String? @db.Text // Информационное предупреждение для категории (отображается на странице каталога)
+
+  // Баннер v2 на странице категории
+  bannerEnabled      Boolean             @default(false)
+  bannerTitle        String?
+  bannerText         String?             @db.Text
+  bannerAlign        CategoryBannerAlign @default(LEFT)
+  bannerTheme        CategoryBannerTheme @default(SOFT)
+  bannerImageUrl     String?
+  bannerLinkUrl      String?
+  bannerLinkLabel    String?
+  bannerShowGuide    Boolean             @default(true)
 
   // Закрепить управление курсом на Дашборде
   isPinnedToDashboard Boolean @default(false)

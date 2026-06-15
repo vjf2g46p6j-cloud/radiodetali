@@ -1,67 +1,156 @@
 import Link from "next/link";
-import { CircuitBoard, BookOpen, ChevronRight } from "lucide-react";
+import Image from "next/image";
+import { AlertTriangle, ArrowRight, BookOpen } from "lucide-react";
+import {
+  type CategoryBannerConfig,
+  type CategoryBannerTheme,
+  getBannerAlignClasses,
+  getBannerThemeStyle,
+  resolveCategoryBannerContent,
+} from "@/lib/category-banner";
 
-interface CategoryBannerProps {
+export interface CategoryBannersProps {
   categoryName: string;
   categorySlug: string;
-  showBoardBanner: boolean;
+  warningMessage?: string | null;
+  banner: CategoryBannerConfig;
+  bannerTextLegacy?: string | null;
   showGuideBanner: boolean;
 }
 
-export function CategoryBanner({
+interface BannerBlockProps {
+  title?: string | null;
+  text: string;
+  theme: CategoryBannerTheme;
+  align: CategoryBannerConfig["align"];
+  imageUrl?: string | null;
+  linkUrl?: string | null;
+  linkLabel?: string | null;
+  showNoticeIcon?: boolean;
+}
+
+function CategoryBannerBlock({
+  title,
+  text,
+  theme,
+  align,
+  imageUrl,
+  linkUrl,
+  linkLabel,
+  showNoticeIcon,
+}: BannerBlockProps) {
+  const hasImage = theme === "IMAGE" && !!imageUrl;
+  const styles = getBannerThemeStyle(theme, hasImage);
+  const alignClasses = getBannerAlignClasses(align);
+
+  return (
+    <div
+      className={`relative overflow-hidden rounded-2xl border p-5 md:p-6 ${styles.shell}`}
+    >
+      {hasImage && imageUrl && (
+        <>
+          <Image
+            src={imageUrl}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 1200px"
+          />
+          <div className={`absolute inset-0 ${styles.overlay}`} />
+        </>
+      )}
+
+      <div
+        className={`relative z-10 flex w-full flex-col gap-3 ${alignClasses.outer} ${alignClasses.text}`}
+      >
+        {showNoticeIcon && theme === "NOTICE" && (
+          <div
+            className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl ${styles.icon} ${alignClasses.icon}`}
+          >
+            <AlertTriangle className="h-5 w-5" />
+          </div>
+        )}
+
+        {title && (
+          <p
+            className={`text-base md:text-lg font-bold leading-snug ${styles.title}`}
+          >
+            {title}
+          </p>
+        )}
+
+        <p
+          className={`text-sm md:text-base leading-relaxed whitespace-pre-wrap ${styles.text} ${
+            title ? "" : "font-medium"
+          }`}
+        >
+          {text}
+        </p>
+
+        {linkUrl && linkLabel && (
+          <a
+            href={linkUrl}
+            className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-colors ${styles.cta} ${alignClasses.cta}`}
+          >
+            {linkLabel}
+            <ArrowRight className="h-4 w-4" />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function CategoryBanners({
   categoryName,
   categorySlug,
-  showBoardBanner,
+  warningMessage,
+  banner,
+  bannerTextLegacy,
   showGuideBanner,
-}: CategoryBannerProps) {
-  if (!showBoardBanner && !showGuideBanner) {
+}: CategoryBannersProps) {
+  const content = resolveCategoryBannerContent(
+    warningMessage,
+    banner.title,
+    bannerTextLegacy,
+  );
+
+  const showGuide =
+    showGuideBanner && banner.showGuide && categorySlug !== "preview";
+
+  if (!content && !showGuide) {
     return null;
   }
 
-  const bothActive = showBoardBanner && showGuideBanner;
-
   return (
-    <div className="mb-6 rounded-xl border border-[var(--primary-200)] bg-white shadow-sm overflow-hidden">
-      {showBoardBanner && (
-        <div
-          className={`flex items-start gap-3 px-4 py-4 md:px-5 md:py-5 ${
-            bothActive
-              ? "bg-[var(--primary-50)] border-b border-[var(--primary-100)]"
-              : "bg-[var(--primary-50)]"
-          }`}
-        >
-          <div className="shrink-0 w-10 h-10 rounded-lg bg-[var(--primary-100)] flex items-center justify-center">
-            <CircuitBoard className="w-5 h-5 text-[var(--primary-600)]" />
-          </div>
-          <p className="text-sm md:text-base text-[var(--primary-900)] font-medium leading-relaxed">
-            Принимаем радиодетали на платах, цена от этого не меняется.
-          </p>
-        </div>
+    <div className="mb-6 space-y-2">
+      {content && (
+        <CategoryBannerBlock
+          title={content.title}
+          text={content.text}
+          theme={banner.theme}
+          align={banner.align}
+          imageUrl={banner.imageUrl}
+          linkUrl={banner.linkUrl?.trim() || null}
+          linkLabel={banner.linkLabel?.trim() || null}
+          showNoticeIcon
+        />
       )}
 
-      {showGuideBanner && (
+      {showGuide && (
         <Link
           href={`/catalog/${categorySlug}/guide`}
-          className={`group flex items-center justify-between gap-3 px-4 py-4 md:px-5 md:py-5 transition-colors ${
-            bothActive
-              ? "bg-white hover:bg-[var(--accent-50)]"
-              : "bg-[var(--accent-50)] hover:bg-[var(--accent-100)]"
-          }`}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--primary-600)] hover:text-[var(--primary-700)] hover:underline"
         >
-          <div className="flex items-start gap-3 min-w-0">
-            <div className="shrink-0 w-10 h-10 rounded-lg bg-[var(--accent-100)] flex items-center justify-center group-hover:bg-[var(--accent-200)] transition-colors">
-              <BookOpen className="w-5 h-5 text-[var(--accent-600)]" />
-            </div>
-            <p className="text-sm md:text-base text-[var(--gray-800)] group-hover:text-[var(--primary-700)] transition-colors leading-relaxed">
-              Информация о категории «{categoryName}» — перейдите в справочник{" "}
-              <span className="text-[var(--accent-600)]">➔</span>
-            </p>
-          </div>
-          <ChevronRight
-            className="w-5 h-5 shrink-0 text-[var(--gray-400)] group-hover:text-[var(--accent-500)] group-hover:translate-x-0.5 transition-all"
-          />
+          <BookOpen className="h-4 w-4 shrink-0" />
+          Справочник: {categoryName}
         </Link>
       )}
     </div>
   );
+}
+
+/** @deprecated Используйте CategoryBanners */
+export function CategoryBanner(props: CategoryBannersProps) {
+  return <CategoryBanners {...props} />;
 }

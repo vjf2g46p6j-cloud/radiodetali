@@ -4,20 +4,6 @@ import path from "path";
 const GUIDES_DIR = path.join(process.cwd(), "content", "category-guides");
 
 /**
- * Баннер «приём на платах» — по умолчанию для всех категорий с товарами.
- * При необходимости можно ограничить список slug в BOARD_BANNER_SLUGS.
- */
-const BOARD_BANNER_SLUGS: string[] = [];
-
-export function showBoardBanner(slug: string, productCount: number): boolean {
-  if (productCount <= 0) return false;
-  if (BOARD_BANNER_SLUGS.length > 0) {
-    return BOARD_BANNER_SLUGS.includes(slug);
-  }
-  return true;
-}
-
-/**
  * Баннер справочника — если для категории есть файл content/category-guides/{slug}.md
  */
 export function showGuideBanner(slug: string): boolean {

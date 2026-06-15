@@ -331,7 +331,7 @@ async function CatalogSection() {
 
                 {/* Description */}
                 {item.description && (
-                  <p className="text-sm text-[var(--gray-500)] mb-5 line-clamp-2">
+                  <p className="text-[15px] leading-snug text-[var(--gray-600)] mb-5 line-clamp-2">
                     {item.description}
                   </p>
                 )}

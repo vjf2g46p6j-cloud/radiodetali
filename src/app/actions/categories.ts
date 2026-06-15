@@ -2,10 +2,59 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import type { CategoryBannerAlign, CategoryBannerTheme } from "@prisma/client";
 
 // ============================================================================
-// Ð¢Ð˜ÐŸÐ«
+// ТИПЫ
 // ============================================================================
+
+function pickBannerFields(category: {
+  bannerEnabled: boolean;
+  bannerTitle: string | null;
+  bannerText: string | null;
+  bannerAlign: CategoryBannerAlign;
+  bannerTheme: CategoryBannerTheme;
+  bannerImageUrl: string | null;
+  bannerLinkUrl: string | null;
+  bannerLinkLabel: string | null;
+  bannerShowGuide: boolean;
+}) {
+  return {
+    bannerEnabled: category.bannerEnabled,
+    bannerTitle: category.bannerTitle,
+    bannerText: category.bannerText,
+    bannerAlign: category.bannerAlign,
+    bannerTheme: category.bannerTheme,
+    bannerImageUrl: category.bannerImageUrl,
+    bannerLinkUrl: category.bannerLinkUrl,
+    bannerLinkLabel: category.bannerLinkLabel,
+    bannerShowGuide: category.bannerShowGuide,
+  };
+}
+
+function pickBannerInput(input: {
+  bannerEnabled?: boolean;
+  bannerTitle?: string | null;
+  bannerText?: string | null;
+  bannerAlign?: CategoryBannerAlign;
+  bannerTheme?: CategoryBannerTheme;
+  bannerImageUrl?: string | null;
+  bannerLinkUrl?: string | null;
+  bannerLinkLabel?: string | null;
+  bannerShowGuide?: boolean;
+}) {
+  const data: Record<string, unknown> = {};
+  if (input.bannerEnabled !== undefined) data.bannerEnabled = input.bannerEnabled;
+  if (input.bannerTitle !== undefined) data.bannerTitle = input.bannerTitle?.trim() || null;
+  if (input.bannerText !== undefined) data.bannerText = input.bannerText?.trim() || null;
+  if (input.bannerAlign !== undefined) data.bannerAlign = input.bannerAlign;
+  if (input.bannerTheme !== undefined) data.bannerTheme = input.bannerTheme;
+  if (input.bannerImageUrl !== undefined) data.bannerImageUrl = input.bannerImageUrl || null;
+  if (input.bannerLinkUrl !== undefined) data.bannerLinkUrl = input.bannerLinkUrl?.trim() || null;
+  if (input.bannerLinkLabel !== undefined) data.bannerLinkLabel = input.bannerLinkLabel?.trim() || null;
+  if (input.bannerShowGuide !== undefined) data.bannerShowGuide = input.bannerShowGuide;
+  return data;
+}
 
 /**
  * Ð”Ð°Ð½Ð½Ñ‹Ðµ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¸ Ð´Ð»Ñ API
@@ -20,6 +69,15 @@ export interface CategoryData {
   sortOrder: number;
   childSortOrder: number;
   warningMessage: string | null;
+  bannerEnabled: boolean;
+  bannerTitle: string | null;
+  bannerText: string | null;
+  bannerAlign: CategoryBannerAlign;
+  bannerTheme: CategoryBannerTheme;
+  bannerImageUrl: string | null;
+  bannerLinkUrl: string | null;
+  bannerLinkLabel: string | null;
+  bannerShowGuide: boolean;
   isPinnedToDashboard: boolean;
   customRateAu: number | null;
   customRateAg: number | null;
@@ -42,6 +100,15 @@ export interface CreateCategoryInput {
   sortOrder?: number;
   childSortOrder?: number;
   warningMessage?: string | null;
+  bannerEnabled?: boolean;
+  bannerTitle?: string | null;
+  bannerText?: string | null;
+  bannerAlign?: CategoryBannerAlign;
+  bannerTheme?: CategoryBannerTheme;
+  bannerImageUrl?: string | null;
+  bannerLinkUrl?: string | null;
+  bannerLinkLabel?: string | null;
+  bannerShowGuide?: boolean;
   isPinnedToDashboard?: boolean;
   customRateAu?: number | null;
   customRateAg?: number | null;
@@ -61,6 +128,15 @@ export interface UpdateCategoryInput {
   sortOrder?: number;
   childSortOrder?: number;
   warningMessage?: string | null;
+  bannerEnabled?: boolean;
+  bannerTitle?: string | null;
+  bannerText?: string | null;
+  bannerAlign?: CategoryBannerAlign;
+  bannerTheme?: CategoryBannerTheme;
+  bannerImageUrl?: string | null;
+  bannerLinkUrl?: string | null;
+  bannerLinkLabel?: string | null;
+  bannerShowGuide?: boolean;
   isPinnedToDashboard?: boolean;
   customRateAu?: number | null;
   customRateAg?: number | null;
@@ -176,6 +252,7 @@ export async function getCategories(rootOnly: boolean = false): Promise<Categori
         sortOrder: cat.sortOrder,
         childSortOrder: cat.childSortOrder,
         warningMessage: cat.warningMessage,
+        ...pickBannerFields(cat),
         isPinnedToDashboard: cat.isPinnedToDashboard,
         customRateAu: cat.customRateAu,
         customRateAg: cat.customRateAg,
@@ -230,6 +307,7 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryResult> {
         sortOrder: category.sortOrder,
         childSortOrder: category.childSortOrder,
         warningMessage: category.warningMessage,
+        ...pickBannerFields(category),
         isPinnedToDashboard: category.isPinnedToDashboard,
         customRateAu: category.customRateAu,
         customRateAg: category.customRateAg,
@@ -278,6 +356,7 @@ export async function getCategoryById(id: string): Promise<CategoryResult> {
         sortOrder: category.sortOrder,
         childSortOrder: category.childSortOrder,
         warningMessage: category.warningMessage,
+        ...pickBannerFields(category),
         isPinnedToDashboard: category.isPinnedToDashboard,
         customRateAu: category.customRateAu,
         customRateAg: category.customRateAg,
@@ -352,6 +431,7 @@ export async function createCategory(
         sortOrder,
         childSortOrder: input.childSortOrder ?? 0,
         warningMessage: input.warningMessage?.trim() || null,
+        ...pickBannerInput(input),
         isPinnedToDashboard: input.isPinnedToDashboard ?? false,
         // ÐšÐ°ÑÑ‚Ð¾Ð¼Ð½Ñ‹Ðµ ÐºÑƒÑ€ÑÑ‹: ÐµÑÐ»Ð¸ Ð¿ÑƒÑÑ‚Ð¾Ðµ/undefined â€” Ð¿Ð¸ÑˆÐµÐ¼ null
         customRateAu: input.customRateAu ?? null,
@@ -379,6 +459,7 @@ export async function createCategory(
         sortOrder: category.sortOrder,
         childSortOrder: category.childSortOrder,
         warningMessage: category.warningMessage,
+        ...pickBannerFields(category),
         isPinnedToDashboard: category.isPinnedToDashboard,
         customRateAu: category.customRateAu,
         customRateAg: category.customRateAg,
@@ -466,8 +547,7 @@ export async function updateCategory(
     if (input.customRateAg !== undefined) updateData.customRateAg = input.customRateAg;
     if (input.customRatePt !== undefined) updateData.customRatePt = input.customRatePt;
     if (input.customRatePd !== undefined) updateData.customRatePd = input.customRatePd;
-    
-    // ÐžÐ±Ñ€Ð°Ð±Ð¾Ñ‚ÐºÐ° Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð¹ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¸ Ñ‡ÐµÑ€ÐµÐ· relation syntax
+    Object.assign(updateData, pickBannerInput(input));
     if (input.parentId !== undefined) {
       if (input.parentId === null) {
         updateData.parent = { disconnect: true };
@@ -506,6 +586,7 @@ export async function updateCategory(
         sortOrder: category.sortOrder,
         childSortOrder: category.childSortOrder,
         warningMessage: category.warningMessage,
+        ...pickBannerFields(category),
         isPinnedToDashboard: category.isPinnedToDashboard,
         customRateAu: category.customRateAu,
         customRateAg: category.customRateAg,
@@ -903,6 +984,7 @@ export async function getSubcategories(parentId: string | null): Promise<Categor
       sortOrder: cat.sortOrder,
       childSortOrder: cat.childSortOrder,
       warningMessage: cat.warningMessage,
+      ...pickBannerFields(cat),
       isPinnedToDashboard: cat.isPinnedToDashboard,
       customRateAu: cat.customRateAu,
       customRateAg: cat.customRateAg,
@@ -992,6 +1074,7 @@ export async function getPinnedCategories(): Promise<CategoriesResult> {
       sortOrder: cat.sortOrder,
       childSortOrder: cat.childSortOrder,
       warningMessage: cat.warningMessage,
+      ...pickBannerFields(cat),
       isPinnedToDashboard: cat.isPinnedToDashboard,
       customRateAu: cat.customRateAu,
       customRateAg: cat.customRateAg,

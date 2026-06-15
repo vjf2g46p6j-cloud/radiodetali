@@ -9,6 +9,8 @@ import {
   updateCategory,
   type CategoryData,
 } from "@/app/actions";
+import { CategoryBannerEditor } from "./CategoryBannerEditor";
+import type { CategoryBannerAlign, CategoryBannerTheme } from "@prisma/client";
 import {
   Save,
   Loader2,
@@ -23,6 +25,7 @@ interface CategoryFormProps {
   editCategory?: CategoryData;
   defaultParentId?: string;
   redirectPath?: string;
+  hasGuide?: boolean;
 }
 
 interface FormData {
@@ -32,6 +35,13 @@ interface FormData {
   sortOrder: number;
   childSortOrder: number;
   warningMessage: string;
+  bannerTitle: string;
+  bannerAlign: CategoryBannerAlign;
+  bannerTheme: CategoryBannerTheme;
+  bannerImageUrl: string;
+  bannerLinkUrl: string;
+  bannerLinkLabel: string;
+  bannerShowGuide: boolean;
   // Закрепить управление курсом на Дашборде
   isPinnedToDashboard: boolean;
   // Кастомные курсы металлов (цена за 1 мг в рублях)
@@ -64,6 +74,7 @@ export function CategoryForm({
   editCategory,
   defaultParentId,
   redirectPath,
+  hasGuide = false,
 }: CategoryFormProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -91,7 +102,17 @@ export function CategoryForm({
       parentId: editCategory?.parentId || defaultParentId || "",
       sortOrder: editCategory?.sortOrder ?? 0,
       childSortOrder: editCategory?.childSortOrder ?? 0,
-      warningMessage: editCategory?.warningMessage || "",
+      warningMessage:
+        editCategory?.warningMessage ||
+        editCategory?.bannerText ||
+        "",
+      bannerTitle: editCategory?.bannerTitle || "",
+      bannerAlign: editCategory?.bannerAlign ?? "LEFT",
+      bannerTheme: editCategory?.bannerTheme ?? "NOTICE",
+      bannerImageUrl: editCategory?.bannerImageUrl || "",
+      bannerLinkUrl: editCategory?.bannerLinkUrl || "",
+      bannerLinkLabel: editCategory?.bannerLinkLabel || "",
+      bannerShowGuide: editCategory?.bannerShowGuide ?? true,
       isPinnedToDashboard: editCategory?.isPinnedToDashboard ?? false,
       customRateAu: editCategory?.customRateAu?.toString() || "",
       customRateAg: editCategory?.customRateAg?.toString() || "",
@@ -102,6 +123,9 @@ export function CategoryForm({
 
   // Смотрим parentId чтобы показать/скрыть childSortOrder
   const watchParentId = watch("parentId");
+  const watchName = watch("name");
+  const watchSlug = watch("slug");
+  const watchWarningMessage = watch("warningMessage");
   const isRootCategory = !watchParentId && !defaultParentId;
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -197,6 +221,15 @@ export function CategoryForm({
           childSortOrder: data.childSortOrder,
           warningMessage: data.warningMessage || null,
           imageUrl: imageUrl || null,
+          bannerEnabled: !!(data.warningMessage?.trim() || data.bannerTitle?.trim()),
+          bannerTitle: data.bannerTitle || null,
+          bannerText: null,
+          bannerAlign: data.bannerAlign,
+          bannerTheme: data.bannerTheme,
+          bannerImageUrl: data.bannerImageUrl || null,
+          bannerLinkUrl: data.bannerLinkUrl || null,
+          bannerLinkLabel: data.bannerLinkLabel || null,
+          bannerShowGuide: data.bannerShowGuide,
           isPinnedToDashboard: data.isPinnedToDashboard,
           customRateAu: parseRate(data.customRateAu),
           customRateAg: parseRate(data.customRateAg),
@@ -212,6 +245,15 @@ export function CategoryForm({
           childSortOrder: data.childSortOrder,
           warningMessage: data.warningMessage || null,
           imageUrl: imageUrl || null,
+          bannerEnabled: !!(data.warningMessage?.trim() || data.bannerTitle?.trim()),
+          bannerTitle: data.bannerTitle || null,
+          bannerText: null,
+          bannerAlign: data.bannerAlign,
+          bannerTheme: data.bannerTheme,
+          bannerImageUrl: data.bannerImageUrl || null,
+          bannerLinkUrl: data.bannerLinkUrl || null,
+          bannerLinkLabel: data.bannerLinkLabel || null,
+          bannerShowGuide: data.bannerShowGuide,
           isPinnedToDashboard: data.isPinnedToDashboard,
           customRateAu: parseRate(data.customRateAu),
           customRateAg: parseRate(data.customRateAg),
@@ -399,25 +441,29 @@ export function CategoryForm({
             </div>
           )}
 
-          {/* Warning Message */}
-          <div>
-            <label
-              htmlFor="cat-warningMessage"
-              className="block text-sm font-medium text-slate-700 mb-1"
-            >
-              Предупреждение (Инфо-блок)
-            </label>
-            <textarea
-              id="cat-warningMessage"
-              rows={3}
-              {...register("warningMessage")}
-              className="w-full px-4 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
-              placeholder="Например: С 1990 года минус 10% от стоимости..."
-            />
-            <p className="mt-1 text-xs text-slate-500">
-              Если оставить пустым — блок не будет отображаться на сайте
-            </p>
-          </div>
+          {/* Баннер категории */}
+          <CategoryBannerEditor
+            categoryName={watchName}
+            categorySlug={watchSlug}
+            warningMessage={watchWarningMessage}
+            bannerTextLegacy={editCategory?.bannerText || ""}
+            hasGuide={hasGuide}
+            values={{
+              bannerTitle: watch("bannerTitle"),
+              bannerAlign: watch("bannerAlign"),
+              bannerTheme: watch("bannerTheme"),
+              bannerImageUrl: watch("bannerImageUrl"),
+              bannerLinkUrl: watch("bannerLinkUrl"),
+              bannerLinkLabel: watch("bannerLinkLabel"),
+              bannerShowGuide: watch("bannerShowGuide"),
+            }}
+            onWarningMessageChange={(value) =>
+              setValue("warningMessage", value, { shouldDirty: true })
+            }
+            onChange={(key, value) => {
+              setValue(key as keyof FormData, value as never, { shouldDirty: true });
+            }}
+          />
 
           {/* Image Upload */}
           <div>

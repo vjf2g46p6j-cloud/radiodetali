@@ -93,7 +93,7 @@ export function SellModal({ contactInfo }: SellModalProps) {
                   className="flex items-center gap-3 px-4 py-3 bg-[var(--primary-600)] hover:bg-[var(--primary-700)] text-white rounded-xl font-semibold transition-colors"
                 >
                   <Phone className="w-5 h-5 shrink-0" />
-                  <span>Позвонить ({contacts.phoneNumber})</span>
+                  <span>Позвонить {contacts.phoneNumber}</span>
                 </a>
 
                 {/* Telegram */}

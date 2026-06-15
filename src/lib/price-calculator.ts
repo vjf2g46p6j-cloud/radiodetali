@@ -328,6 +328,15 @@ export function formatPrice(price: number): string {
 }
 
 /**
+ * Число с ограничением знаков после запятой без лишних нулей (0.75, не 0.7500).
+ */
+function formatTrimmedNumber(value: number, maxDecimals: number): string {
+  const str = value.toFixed(maxDecimals);
+  if (!str.includes(".")) return str;
+  return str.replace(/0+$/, "").replace(/\.$/, "");
+}
+
+/**
  * Форматирует содержание металла для отображения
  * Подходит только для Au, Pt, Pd (в мг). Для Ag используйте formatSilverContent.
  * @param content - Содержание в мг
@@ -339,15 +348,15 @@ export function formatMetalContent(content: unknown): string {
   
   // Форматируем в зависимости от величины
   if (value < 1) {
-    return `${value.toFixed(4)} мг`;
+    return `${formatTrimmedNumber(value, 4)} мг`;
   } else if (value < 10) {
-    return `${value.toFixed(3)} мг`;
+    return `${formatTrimmedNumber(value, 3)} мг`;
   } else if (value < 1000) {
-    return `${value.toFixed(2)} мг`;
+    return `${formatTrimmedNumber(value, 2)} мг`;
   }
   // Для значений >= 1000 мг показываем в граммах
   const grams = value / 1000;
-  return `${grams.toFixed(3)} г`;
+  return `${formatTrimmedNumber(grams, 3)} г`;
 }
 
 /**
@@ -360,11 +369,11 @@ export function formatSilverContent(content: unknown): string {
   if (value === 0) return "—";
   
   if (value < 1) {
-    return `${value.toFixed(4)} г`;
+    return `${formatTrimmedNumber(value, 4)} г`;
   } else if (value < 10) {
-    return `${value.toFixed(3)} г`;
+    return `${formatTrimmedNumber(value, 3)} г`;
   } else {
-    return `${value.toFixed(2)} г`;
+    return `${formatTrimmedNumber(value, 2)} г`;
   }
 }
 

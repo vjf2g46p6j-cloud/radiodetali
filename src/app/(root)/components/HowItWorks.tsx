@@ -58,8 +58,8 @@ export function HowItWorks({ variant = "section" }: { variant?: "section" | "pag
         {/* Заголовок секции */}
         <div className="text-center mb-12 md:mb-16">
           <TitleTag className="text-2xl md:text-3xl lg:text-4xl font-bold text-white">
-            Как сдать радиодетали:{" "}
-            <span className="bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-300 bg-clip-text text-transparent">
+            Как сдать радиодетали:
+            <span className="block mt-1 sm:inline sm:mt-0 sm:ml-1 bg-gradient-to-r from-amber-300 via-yellow-300 to-amber-300 bg-clip-text text-transparent">
               4 простых шага
             </span>
           </TitleTag>
