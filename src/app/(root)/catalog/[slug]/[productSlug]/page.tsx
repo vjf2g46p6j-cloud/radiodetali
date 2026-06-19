@@ -13,7 +13,7 @@ import {
 } from "@/app/actions";
 import { ProductCard, ProductGridSkeleton } from "../../../components";
 import { ProductDetailView } from "../../../components/ProductDetailView";
-import type { SellModalContactInfo } from "../../../components";
+import { buildSellContactInfo, SITE_BRAND } from "@/lib/site";
 
 interface ProductPageProps {
   params: Promise<{ slug: string; productSlug: string }>;
@@ -43,7 +43,7 @@ export async function generateMetadata({
   const product = result.data;
   const canonicalUrl = `${BASE_URL}/catalog/${categorySlug}/${productSlug}`;
   const seoName = product.seoH1 || product.name;
-  const autoDescription = `Сдать ${seoName} по высоким ценам в Санкт-Петербурге. Скупаем в любых объемах. Оценка по фото в мессенджере, оплата сразу, честное взвешивание. Компания ДрагСоюз в СПб. Звоните +7 (921)-632-01-05`;
+  const autoDescription = `Сдать ${seoName} по высоким ценам в Санкт-Петербурге. Скупаем в любых объемах. Оценка по фото в мессенджере, оплата сразу, честное взвешивание. Компания ${SITE_BRAND} в СПб.`;
 
   const imageUrl = product.image
     ? product.image.startsWith("http")
@@ -53,14 +53,14 @@ export async function generateMetadata({
 
   return {
     title: {
-      absolute: `Скупаем ${seoName} по высоким ценам в Санкт-Петербурге | Любые объемы, честное взвешивание, оплата сразу | ДрагСоюз СПб`,
+      absolute: `Скупаем ${seoName} по высоким ценам в Санкт-Петербурге | Любые объемы, честное взвешивание, оплата сразу | ${SITE_BRAND}`,
     },
     description: product.seoDescription || autoDescription,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `Скупаем ${seoName} в Санкт-Петербурге | ДрагСоюз СПб`,
+      title: `Скупаем ${seoName} в Санкт-Петербурге | ${SITE_BRAND}`,
       description:
         product.seoDescription ||
         `Сдать ${seoName} дорого в СПб. Оценка по фото, оплата сразу.`,
@@ -227,14 +227,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
 
   const settingsResult = await getGlobalSettings();
   const settings = settingsResult.success ? settingsResult.data : null;
-  const sellContactInfo: SellModalContactInfo | undefined = settings
-    ? {
-        phoneNumber: settings.phoneNumber || "+7 (812) 983-49-76",
-        phoneHref: `tel:${(settings.phoneNumber || "+78129834976").replace(/[^\d+]/g, "")}`,
-        telegramHref: `https://t.me/${(settings.telegramUsername || "dragsoyuz").replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "")}`,
-        vkHref: settings.vkLink || "https://vk.com/dragsoyuz",
-      }
-    : undefined;
+  const sellContactInfo = buildSellContactInfo(settings);
 
   return (
     <>

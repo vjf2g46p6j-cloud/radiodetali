@@ -4,6 +4,8 @@ import { getGlobalSettings } from "@/app/actions";
 import type { HeaderContactInfo } from "./components/Header";
 import type { FooterContactInfo } from "./components/Footer";
 import { JivoWidget } from "./components/JivoWidget";
+import { SiteContactsProvider } from "./components/SiteContactsProvider";
+import { buildSellContactInfo, formatPhoneHref, formatTelegramHref } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
@@ -26,19 +28,6 @@ export const metadata: Metadata = {
   ],
 };
 
-// Хелпер для преобразования телефона в формат для href
-function formatPhoneHref(phone: string): string {
-  // Убираем все нецифровые символы кроме +
-  return `tel:${phone.replace(/[^\d+]/g, "")}`;
-}
-
-// Хелпер для формирования ссылки на Telegram
-function formatTelegramHref(username: string): string {
-  // Убираем @ если есть и формируем ссылку
-  const cleanUsername = username.replace(/^@/, "").replace(/^https?:\/\/t\.me\//, "");
-  return `https://t.me/${cleanUsername}`;
-}
-
 export default async function RootLayout({
   children,
 }: {
@@ -47,6 +36,7 @@ export default async function RootLayout({
   // Получаем контактные данные из БД
   const settingsResult = await getGlobalSettings();
   const settings = settingsResult.success ? settingsResult.data : null;
+  const sellContactInfo = buildSellContactInfo(settings);
 
   // Формируем данные для Header
   const headerContactInfo: HeaderContactInfo | undefined = settings ? {
@@ -71,7 +61,8 @@ export default async function RootLayout({
   } : undefined;
 
   return (
-    <div className="h-full flex flex-col bg-[var(--background)] overflow-y-auto overflow-x-hidden overscroll-none" style={{ WebkitOverflowScrolling: 'touch' }}>
+    <SiteContactsProvider contacts={sellContactInfo}>
+      <div className="h-full flex flex-col bg-[var(--background)] overflow-y-auto overflow-x-hidden overscroll-none" style={{ WebkitOverflowScrolling: 'touch' }}>
       <div className="sticky top-0 z-50 bg-[var(--gray-700)] shrink-0" style={{ paddingTop: 'env(safe-area-inset-top, 0px)' }}>
         <TopAlert show={settings?.showArrivalNotice ?? true} />
         <Header contactInfo={headerContactInfo} />
@@ -80,5 +71,6 @@ export default async function RootLayout({
       <Footer contactInfo={footerContactInfo} />
       <JivoWidget />
     </div>
+    </SiteContactsProvider>
   );
 }

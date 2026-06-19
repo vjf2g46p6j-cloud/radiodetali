@@ -2,6 +2,7 @@
 
 import { useEffect, useCallback, useState } from "react";
 import { X, Phone, Send, MessageCircle } from "lucide-react";
+import { useSiteContacts } from "./SiteContactsProvider";
 
 export interface SellModalContactInfo {
   phoneNumber: string;
@@ -23,7 +24,8 @@ const DEFAULT_CONTACTS: SellModalContactInfo = {
 
 export function SellModal({ contactInfo }: SellModalProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const contacts = contactInfo ?? DEFAULT_CONTACTS;
+  const siteContacts = useSiteContacts();
+  const contacts = contactInfo ?? siteContacts ?? DEFAULT_CONTACTS;
 
   const close = useCallback(() => setIsOpen(false), []);
 

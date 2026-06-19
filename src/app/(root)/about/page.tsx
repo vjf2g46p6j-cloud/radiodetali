@@ -11,15 +11,16 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { getGlobalSettings } from "@/app/actions";
+import { SITE_BRAND } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
-  title: { absolute: "О компании по скупке радиодеталей ДрагСоюз | Санкт-Петербург" },
+  title: { absolute: `О компании по скупке радиодеталей в Санкт-Петербурге | ${SITE_BRAND}` },
   description:
-    "ДРАГСОЮЗ — профессиональная скупка радиодеталей с драгоценными металлами в Санкт-Петербурге. Честное взвешивание, оплата сразу, работаем с физическими и юридическими лицами.",
+    `${SITE_BRAND} — профессиональная скупка радиодеталей с драгоценными металлами в Санкт-Петербурге. Честное взвешивание, оплата сразу, работаем с физическими и юридическими лицами.`,
   alternates: {
     canonical: `${BASE_URL}/about`,
   },

@@ -5,13 +5,14 @@ import Image from "next/image";
 import { Package, ChevronRight } from "lucide-react";
 import { ProductGridSkeleton } from "../components";
 import { prisma } from "@/lib/prisma";
+import { SITE_BRAND } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
-  title: { absolute: "Каталог скупаемых в Санкт-Петербурге радиодеталей с ценами и фото | ДрагСоюз СПб" },
+  title: { absolute: `Каталог скупаемых в Санкт-Петербурге радиодеталей с ценами и фото | ${SITE_BRAND}` },
   description:
     "Полный каталог радиодеталей с актуальными ценами скупки. Транзисторы, конденсаторы, микросхемы, реле и другие детали. Покупаем дорого, в любых объемах. Оплата сразу.",
   alternates: {

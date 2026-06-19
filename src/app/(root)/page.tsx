@@ -12,6 +12,7 @@ import {
 import { getCategoryShowcase, getGlobalSettings } from "@/app/actions";
 import { BenefitsSection } from "./components/BenefitCard";
 import { ReviewsSection } from "./components/ReviewsSection";
+import { SITE_BRAND } from "@/lib/site";
 
 // Отключаем статический пререндеринг (требуется БД)
 export const dynamic = "force-dynamic";
@@ -19,13 +20,13 @@ export const dynamic = "force-dynamic";
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
-  title: { absolute: "Покупка радиодеталей и плат в СПБ | Скупка по выгодным ценам | Любые объемы | ДрагСоюз" },
-  description: "Выгодная скупка радиодеталей, приборов и лома драгметаллов в Санкт-Петербурге. Высокие цены, любые объемы, честное взвешивание, оплата сразу. Работаем с физическими и юридическими лицами - компания Драгсоюз СПб",
+  title: { absolute: `Покупка радиодеталей и плат в СПБ | Скупка по выгодным ценам | Любые объемы | ${SITE_BRAND}` },
+  description: `Выгодная скупка радиодеталей, приборов и лома драгметаллов в Санкт-Петербурге. Высокие цены, любые объемы, честное взвешивание, оплата сразу. Работаем с физическими и юридическими лицами — компания ${SITE_BRAND} СПб`,
   alternates: {
     canonical: BASE_URL,
   },
   openGraph: {
-    title: "Покупка радиодеталей и плат в СПБ | Скупка по выгодным ценам | ДрагСоюз",
+    title: `Покупка радиодеталей и плат в СПБ | Скупка по выгодным ценам | ${SITE_BRAND}`,
     description: "Выгодная скупка радиодеталей, приборов и лома драгметаллов в Санкт-Петербурге. Высокие цены, любые объемы, честное взвешивание, оплата сразу.",
     type: "website",
     url: BASE_URL,
@@ -509,7 +510,7 @@ export default async function HomePage() {
     <>
       {/* JSON-LD Schema.org LocalBusiness */}
       <OrganizationSchema
-        name="ДРАГСОЮЗ"
+        name={SITE_BRAND}
         phone={settings?.phoneNumber}
         email={settings?.email}
         address={settings?.address}

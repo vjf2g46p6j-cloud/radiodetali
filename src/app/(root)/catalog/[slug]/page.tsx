@@ -8,6 +8,7 @@ import { ProductGridSkeleton } from "../../components";
 import { CategoryPageClient } from "./CategoryPageClient";
 import { showGuideBanner } from "@/lib/category-banners";
 import { bannerConfigFromCategory } from "@/lib/category-banner";
+import { SITE_BRAND } from "@/lib/site";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
@@ -31,13 +32,13 @@ export async function generateMetadata({
   const canonicalUrl = `${BASE_URL}/catalog/${slug}`;
 
   return {
-    title: { absolute: `Скупка ${category.name} в Санкт-Петербурге по высоким ценам | Покупаем в любом объеме, оплата сразу | ДрагСоюз СПб` },
-    description: `Скупаем ${category.name} по высоким ценам в Санкт-Петербурге. Оценка по фото, скупаем в любом объеме, оплата сразу, честное взвешивание. Компания ДрагСоюз в СПб. Звоните +7 (921)-632-01-05`,
+    title: { absolute: `Скупка ${category.name} в Санкт-Петербурге по высоким ценам | Покупаем в любом объеме, оплата сразу | ${SITE_BRAND}` },
+    description: `Скупаем ${category.name} по высоким ценам в Санкт-Петербурге. Оценка по фото, скупаем в любом объеме, оплата сразу, честное взвешивание. Компания ${SITE_BRAND} в СПб.`,
     alternates: {
       canonical: canonicalUrl,
     },
     openGraph: {
-      title: `Скупка ${category.name} в Санкт-Петербурге | ДрагСоюз СПб`,
+      title: `Скупка ${category.name} в Санкт-Петербурге | ${SITE_BRAND}`,
       description: `Скупаем ${category.name} по высоким ценам. Оплата сразу, оценка по фото.`,
       type: "website",
       url: canonicalUrl,

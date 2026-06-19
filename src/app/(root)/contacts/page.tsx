@@ -10,15 +10,16 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { getGlobalSettings } from "@/app/actions";
+import { SITE_BRAND } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
-  title: { absolute: "Контакты пункта скупки радиодеталей в СПб | ДрагСоюз" },
+  title: { absolute: `Контакты пункта скупки радиодеталей в СПб | ${SITE_BRAND}` },
   description:
-    "Свяжитесь с нами для оценки и скупки радиодеталей в Санкт-Петербурге. Телефон, Telegram, ВКонтакте, адрес пункта приёма. Компания ДрагСоюз СПб.",
+    `Свяжитесь с нами для оценки и скупки радиодеталей в Санкт-Петербурге. Телефон, Telegram, ВКонтакте, адрес пункта приёма. Компания ${SITE_BRAND}.`,
   alternates: {
     canonical: `${BASE_URL}/contacts`,
   },
@@ -229,7 +230,7 @@ export default async function ContactsPage() {
                 frameBorder="0"
                 allowFullScreen
                 style={{ position: 'absolute', top: 0, left: 0 }}
-                title="Яндекс Карта - Драг Союз"
+                title={`Яндекс Карта — ${SITE_BRAND}`}
               />
             </div>
           </div>

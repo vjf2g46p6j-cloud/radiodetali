@@ -2,15 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 import { HowItWorks } from "../components";
+import { SITE_BRAND } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
-  title: { absolute: "Как сдать радиодетали: 4 простых шага | ДрагСоюз СПб" },
+  title: { absolute: `Как сдать радиодетали: 4 простых шага | ${SITE_BRAND}` },
   description:
-    "Пошаговая инструкция: как сдать радиодетали в ДрагСоюз. Свяжитесь с нами, приезжайте в офис, получите оценку по ценам с сайта и оплату наличными без задержек.",
+    `Пошаговая инструкция: как сдать радиодетали в ${SITE_BRAND}. Свяжитесь с нами, приезжайте в офис, получите оценку по ценам с сайта и оплату наличными без задержек.`,
   alternates: {
     canonical: `${BASE_URL}/how-to-sell`,
   },
