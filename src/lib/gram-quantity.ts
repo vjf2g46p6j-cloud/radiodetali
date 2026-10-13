@@ -94,10 +94,9 @@ export function computeLineTotal(
   if (!product || !usesGramQuantity(product)) {
     return finishLineTotal(unitPrice * quantity, product);
   }
-  return finishLineTotal(
-    lineTotalFromGrams(unitPrice, quantity, product.unitType),
-    product,
-  );
+  // Сумма за граммы — доля цены за кг, без снапа к сотням:
+  // 2 г по 25 ₽/г = 50 ₽, а не 0 или 100.
+  return lineTotalFromGrams(unitPrice, quantity, product.unitType);
 }
 
 export function formatInventoryQuantity(
