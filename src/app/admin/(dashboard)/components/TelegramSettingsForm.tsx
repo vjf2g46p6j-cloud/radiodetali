@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { updateGlobalSettings, GlobalSettingsData } from "@/app/actions";
 import { Bot, MessageSquare, Loader2, Check, AlertCircle, Eye, EyeOff } from "lucide-react";
+import { SITE_BRAND } from "@/lib/site";
 
 interface TelegramSettingsFormProps {
   initialData: GlobalSettingsData;
@@ -65,7 +66,7 @@ export function TelegramSettingsForm({ initialData }: TelegramSettingsFormProps)
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             chat_id: form.telegramChatId.trim(),
-            text: "✅ Тестовое сообщение от ДРАГСОЮЗ\n\nПодключение настроено успешно!",
+            text: `✅ Тестовое сообщение от ${SITE_BRAND}\n\nПодключение настроено успешно!`,
             parse_mode: "HTML",
           }),
         }

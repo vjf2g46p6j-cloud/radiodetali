@@ -31,6 +31,7 @@ import {
   shouldCountGoldBearingSum,
   shouldShowYearPicker,
 } from "@/lib/inventory-print-groups";
+import { SITE_BRAND } from "@/lib/site";
 import {
   computeLineTotal,
   formatInventoryQuantity,
@@ -50,7 +51,7 @@ function formatPrice(price: number): string {
     style: "currency",
     currency: "RUB",
     minimumFractionDigits: 0,
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(price);
 }
 
@@ -407,7 +408,7 @@ export function CartPageClient({ isAdmin }: { isAdmin: boolean }) {
                 Внутренний отчёт
               </p>
             ) : null}
-            <h1 className="text-xl font-bold">Опись — ДРАГСОЮЗ</h1>
+            <h1 className="text-xl font-bold">Опись — {SITE_BRAND}</h1>
           </div>
           <div className="text-right">
             <p>Лист № 1</p>

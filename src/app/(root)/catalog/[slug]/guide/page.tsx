@@ -5,10 +5,9 @@ import { ChevronRight, ArrowLeft, BookOpen } from "lucide-react";
 import { getCategoryBySlug } from "@/app/actions";
 import { CategoryInfoBlocks } from "@/app/(root)/components/CategoryInfoBlocks";
 import { parseInfoPageBlocks, resolveInfoButtonLabel } from "@/lib/category-info";
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 interface GuidePageProps {
   params: Promise<{ slug: string }>;

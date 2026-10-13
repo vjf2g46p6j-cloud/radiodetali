@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* Оформление драгсоюза. Второй магазин переопределит цвета в [data-theme="..."]. */
 :root {
   /* Industrial Color Palette */
   --background: #f8f9fa;

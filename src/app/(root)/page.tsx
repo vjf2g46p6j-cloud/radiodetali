@@ -12,12 +12,10 @@ import {
 import { getCategoryShowcase, getGlobalSettings } from "@/app/actions";
 import { BenefitsSection } from "./components/BenefitCard";
 import { ReviewsSection } from "./components/ReviewsSection";
-import { SITE_BRAND } from "@/lib/site";
+import { SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 // Отключаем статический пререндеринг (требуется БД)
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
   title: { absolute: `Покупка радиодеталей и плат в СПБ | Скупка по выгодным ценам | Любые объемы | ${SITE_BRAND}` },
@@ -106,7 +104,7 @@ function parseWorkSchedule(schedule: string): Array<{
 }
 
 function OrganizationSchema({ name, phone, email, address, workSchedule, telegram }: OrganizationSchemaProps) {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
+  const baseUrl = BASE_URL;
   
   const openingHours = workSchedule ? parseWorkSchedule(workSchedule) : undefined;
   
@@ -206,7 +204,7 @@ function HeroSection() {
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 leading-tight">
             <span className="bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-200 bg-clip-text text-transparent">
-              ДРАГСОЮЗ
+              {SITE_BRAND}
             </span>
           </h1>
           <h2 className="text-xl md:text-2xl lg:text-3xl text-white/90 mb-8 max-w-2xl mx-auto font-medium">

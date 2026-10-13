@@ -6,11 +6,9 @@ import { ArrowLeft, ChevronRight } from "lucide-react";
 import { getPublishedArticleBySlug, type ArticleFaqItem } from "@/app/actions";
 import { articlePlainText, parseArticleBody } from "@/lib/article-body";
 import { ArticleBodyView } from "../../components/ArticleBodyView";
-import { SITE_BRAND } from "@/lib/site";
+import { SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>;

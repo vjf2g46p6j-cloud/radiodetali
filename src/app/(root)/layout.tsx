@@ -8,15 +8,15 @@ import { PromoPopup } from "./components/PromoPopup";
 import { IosChromeRestoreReload } from "./components/IosChromeRestoreReload";
 import { SiteContactsProvider } from "./components/SiteContactsProvider";
 import { YearDiscountsProvider } from "./components/YearDiscountsProvider";
-import { buildSellContactInfo, formatPhoneHref, formatTelegramHref } from "@/lib/site";
+import { buildSellContactInfo, formatPhoneHref, formatTelegramHref, SITE_BRAND } from "@/lib/site";
 import { DEFAULT_YEAR_PERIOD_DISCOUNTS } from "@/lib/year-discount";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    default: "ДРАГСОЮЗ — Скупка радиодеталей в СПб по высоким ценам",
-    template: "%s | ДРАГСОЮЗ",
+    default: `${SITE_BRAND} — Скупка радиодеталей в СПб по высоким ценам`,
+    template: `%s | ${SITE_BRAND}`,
   },
   description:
     "Профессиональная скупка радиодеталей, содержащих драгоценные металлы. Транзисторы, конденсаторы, микросхемы, реле. Честные цены, быстрая оценка, оплата на месте.",

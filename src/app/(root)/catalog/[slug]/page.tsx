@@ -7,13 +7,11 @@ import { getCategoryBySlug, getProducts } from "@/app/actions";
 import { ProductGridSkeleton } from "../../components";
 import { CategoryPageClient } from "./CategoryPageClient";
 import { bannerConfigFromCategory } from "@/lib/category-banner";
-import { SITE_BRAND } from "@/lib/site";
+import { SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 interface CategoryPageProps {
   params: Promise<{ slug: string }>;
 }
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export async function generateMetadata({
   params,

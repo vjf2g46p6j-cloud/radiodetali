@@ -4,10 +4,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getPublishedArticles } from "@/app/actions";
 import { articlePlainText } from "@/lib/article-body";
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 const PAGE_SIZE = 10;
 
 interface BlogPageProps {

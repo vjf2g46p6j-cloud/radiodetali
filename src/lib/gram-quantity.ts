@@ -73,7 +73,8 @@ export function lineTotalFromGrams(
 ): number {
   const price = Number.isFinite(unitPrice) ? unitPrice : 0;
   const multiplier = quantityToPriceMultiplier(grams, unitType, true);
-  return Math.round(price * multiplier);
+  // Копейки сохраняем: 113 400 ₽/кг × 1 г = 113,4 ₽, а не 113 ₽.
+  return Math.round(price * multiplier * 100) / 100;
 }
 
 function finishLineTotal(
@@ -94,8 +95,7 @@ export function computeLineTotal(
   if (!product || !usesGramQuantity(product)) {
     return finishLineTotal(unitPrice * quantity, product);
   }
-  // Сумма за граммы — доля цены за кг, без снапа к сотням:
-  // 2 г по 25 ₽/г = 50 ₽, а не 0 или 100.
+  // В описи КМ, серебро и платиновая группа не округляются до рублей и сотен.
   return lineTotalFromGrams(unitPrice, quantity, product.unitType);
 }
 

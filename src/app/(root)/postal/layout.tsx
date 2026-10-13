@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_BRAND } from "@/lib/site";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
+import { SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: { absolute: `Отправить радиодетали почтой | Скупка по всей России | ${SITE_BRAND}` },

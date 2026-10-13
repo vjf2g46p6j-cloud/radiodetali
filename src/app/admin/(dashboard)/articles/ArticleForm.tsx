@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AlertCircle, CheckCircle2, ImagePlus, Loader2, Plus, Save, Trash2, X } from "lucide-react";
 import { createArticle, updateArticle, type ArticleFaqItem } from "@/app/actions";
 import { ArticleBodyEditor } from "./ArticleBodyEditor";
+import { siteHostLabel } from "@/lib/site";
 
 function generateSlug(name: string): string {
   return name
@@ -199,7 +200,7 @@ export function ArticleForm({ mode, articleId, initial }: ArticleFormProps) {
             placeholder="poleznaya-informatsiya"
           />
           <p className="mt-1 text-xs text-slate-500">
-            Это не почтовый адрес. Статья откроется как драгсоюз.рф/blog/
+            Это не почтовый адрес. Статья откроется как {siteHostLabel()}/blog/
             {values.slug || "…"}. Латиница, цифры и дефисы, при создании
             подставляется из названия.
           </p>

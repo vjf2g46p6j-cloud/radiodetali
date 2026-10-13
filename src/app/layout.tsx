@@ -3,9 +3,9 @@ import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
 import Script from "next/script";
 import "./globals.css";
+import { SITE_BRAND, SITE_THEME, SITE_URL, YANDEX_METRIKA_ID } from "@/lib/site";
 
-// Базовый URL для генерации абсолютных ссылок (OG images, sitemap и т.д.)
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
+const BASE_URL = SITE_URL;
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -23,8 +23,8 @@ export const metadata: Metadata = {
     "apple-mobile-web-app-status-bar-style": "black-translucent",
   },
   title: {
-    default: "ДРАГСОЮЗ — Скупка радиодеталей с драгметаллами",
-    template: "%s | ДРАГСОЮЗ",
+    default: `${SITE_BRAND} — Скупка радиодеталей с драгметаллами`,
+    template: `%s | ${SITE_BRAND}`,
   },
   description:
     "Профессиональная скупка радиодеталей, содержащих драгоценные металлы: золото, серебро, платина, палладий. Честные цены по актуальному курсу, быстрая оценка, оплата на месте. Транзисторы, конденсаторы, микросхемы, реле.",
@@ -40,9 +40,9 @@ export const metadata: Metadata = {
     "палладий",
     "платина",
   ],
-  authors: [{ name: "ДРАГСОЮЗ" }],
-  creator: "ДРАГСОЮЗ",
-  publisher: "ДРАГСОЮЗ",
+  authors: [{ name: SITE_BRAND }],
+  creator: SITE_BRAND,
+  publisher: SITE_BRAND,
   robots: {
     index: true,
     follow: true,
@@ -57,15 +57,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "ru_RU",
-    url: "https://драгсоюз.рф",
-    siteName: "ДРАГСОЮЗ",
-    title: "ДРАГСОЮЗ — Скупка радиодеталей с драгметаллами",
+    url: BASE_URL,
+    siteName: SITE_BRAND,
+    title: `${SITE_BRAND} — Скупка радиодеталей с драгметаллами`,
     description:
       "Профессиональная скупка радиодеталей. Честные цены, быстрая оценка, оплата на месте.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "ДРАГСОЮЗ — Скупка радиодеталей",
+    title: `${SITE_BRAND} — Скупка радиодеталей`,
     description:
       "Профессиональная скупка радиодеталей с драгоценными металлами",
   },
@@ -82,7 +82,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" style={{ backgroundColor: '#343a40' }}>
+    <html lang="ru" data-theme={SITE_THEME} style={{ backgroundColor: '#343a40' }}>
       <head>
         {/* Explicit theme-color for Telegram/iOS in-app browsers */}
         <meta name="theme-color" content="#343a40" />
@@ -102,9 +102,9 @@ export default function RootLayout({
                 m[i].l=1*new Date();
                 for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
                 k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-              })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=108599989', 'ym');
+              })(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js?id=${YANDEX_METRIKA_ID}', 'ym');
 
-              ym(108599989, 'init', {
+              ym(${YANDEX_METRIKA_ID}, 'init', {
                 ssr: true,
                 webvisor: true,
                 clickmap: true,
@@ -119,7 +119,7 @@ export default function RootLayout({
         />
         <noscript>
           <div>
-            <img src="https://mc.yandex.ru/watch/108599989" style={{ position: 'absolute', left: '-9999px' }} alt="" />
+            <img src={`https://mc.yandex.ru/watch/${YANDEX_METRIKA_ID}`} style={{ position: 'absolute', left: '-9999px' }} alt="" />
           </div>
         </noscript>
       </body>

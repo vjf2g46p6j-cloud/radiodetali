@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { MapPin, Phone, Mail, Clock } from "lucide-react";
 import { ReviewSubmitModal } from "./ReviewSubmitModal";
+import { SITE_BRAND } from "@/lib/site";
 
 // Тип контактных данных для Footer
 export interface FooterContactInfo {
@@ -39,9 +40,9 @@ export function Footer({ contactInfo }: FooterProps) {
           <div className="lg:col-span-1">
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 flex items-center justify-center">
-                <Image src="/icon.svg" alt="ДРАГСОЮЗ" width={40} height={40} />
+                <Image src="/icon.svg" alt={SITE_BRAND} width={40} height={40} />
               </div>
-              <span className="font-bold text-xl bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-200 bg-clip-text text-transparent">ДРАГСОЮЗ</span>
+              <span className="font-bold text-xl bg-gradient-to-r from-amber-200 via-yellow-300 to-amber-200 bg-clip-text text-transparent">{SITE_BRAND}</span>
             </Link>
             <p className="text-white/60 text-sm leading-relaxed mb-4">
               Профессиональная скупка радиодеталей, содержащих драгоценные
@@ -191,7 +192,7 @@ export function Footer({ contactInfo }: FooterProps) {
         {/* Bottom bar */}
         <div className="mt-8 pt-6 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/40">
-            <p>© 2026 ДРАГСОЮЗ. Все права защищены.</p>
+            <p>© 2026 {SITE_BRAND}. Все права защищены.</p>
             <ReviewSubmitModal />
             <p>Санкт-Петербург</p>
           </div>

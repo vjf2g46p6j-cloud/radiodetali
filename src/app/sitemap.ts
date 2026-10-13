@@ -1,7 +1,6 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
+import { SITE_URL as BASE_URL } from "@/lib/site";
 
 // Генерация sitemap происходит динамически (при запросе), т.к. требуется доступ к БД
 export const dynamic = "force-dynamic";

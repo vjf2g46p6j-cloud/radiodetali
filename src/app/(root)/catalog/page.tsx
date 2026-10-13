@@ -5,11 +5,9 @@ import Image from "next/image";
 import { Package, ChevronRight } from "lucide-react";
 import { ProductGridSkeleton } from "../components";
 import { prisma } from "@/lib/prisma";
-import { SITE_BRAND } from "@/lib/site";
+import { SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 export const metadata: Metadata = {
   title: { absolute: `Каталог скупаемых в Санкт-Петербурге радиодеталей с ценами и фото | ${SITE_BRAND}` },

@@ -13,13 +13,11 @@ import {
 } from "@/app/actions";
 import { ProductCard, ProductGridSkeleton } from "../../../components";
 import { ProductDetailView } from "../../../components/ProductDetailView";
-import { buildSellContactInfo, SITE_BRAND } from "@/lib/site";
+import { buildSellContactInfo, SITE_BRAND, SITE_URL as BASE_URL } from "@/lib/site";
 
 interface ProductPageProps {
   params: Promise<{ slug: string; productSlug: string }>;
 }
-
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://драгсоюз.рф";
 
 function getDisplayPrice(product: {
   priceNew: number | null;

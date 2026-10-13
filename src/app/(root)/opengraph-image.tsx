@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { SITE_BRAND } from "@/lib/site";
 
 // Размеры OG изображения (рекомендуемые для социальных сетей)
 export const size = {
@@ -7,7 +8,7 @@ export const size = {
 };
 
 export const contentType = "image/png";
-export const alt = "ДРАГСОЮЗ — Скупка радиодеталей в СПб";
+export const alt = `${SITE_BRAND} — Скупка радиодеталей в СПб`;
 
 export default async function Image() {
   return new ImageResponse(
@@ -68,7 +69,7 @@ export default async function Image() {
               letterSpacing: "-2px",
             }}
           >
-            ДРАГСОЮЗ
+            {SITE_BRAND}
           </div>
 
           {/* Tagline */}
