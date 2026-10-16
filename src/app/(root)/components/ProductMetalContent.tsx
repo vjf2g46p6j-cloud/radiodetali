@@ -12,17 +12,19 @@ interface ProductMetalContentProps {
   contentSilver: number;
   contentPlatinum: number;
   contentPalladium: number;
+  contentTantalum: number;
   variant?: "standalone" | "embedded";
 }
 
 const METAL_FIELDS: Record<
   MetalSymbol,
-  "contentGold" | "contentSilver" | "contentPlatinum" | "contentPalladium"
+  "contentGold" | "contentSilver" | "contentPlatinum" | "contentPalladium" | "contentTantalum"
 > = {
   Au: "contentGold",
   Ag: "contentSilver",
   Pt: "contentPlatinum",
   Pd: "contentPalladium",
+  Ta: "contentTantalum",
 };
 
 const METAL_BADGES: Record<MetalSymbol, string> = {
@@ -30,6 +32,7 @@ const METAL_BADGES: Record<MetalSymbol, string> = {
   Ag: "bg-slate-300 text-slate-800",
   Pt: "bg-sky-200 text-sky-900",
   Pd: "bg-violet-200 text-violet-900",
+  Ta: "bg-stone-300 text-stone-900",
 };
 
 export function ProductMetalContent({
@@ -39,6 +42,7 @@ export function ProductMetalContent({
   contentSilver,
   contentPlatinum,
   contentPalladium,
+  contentTantalum,
   variant = "standalone",
 }: ProductMetalContentProps) {
   const values = {
@@ -46,6 +50,7 @@ export function ProductMetalContent({
     contentSilver,
     contentPlatinum,
     contentPalladium,
+    contentTantalum,
   };
 
   const items = PRECIOUS_METAL_LIST.filter(

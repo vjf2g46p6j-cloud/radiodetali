@@ -13,7 +13,7 @@ export async function MetalRatesBar() {
     return null;
   }
 
-  const { gold, silver, platinum, palladium } = result.data;
+  const { gold, silver, platinum, palladium, tantalum } = result.data;
 
   // Контент курсов (не как компонент, а как JSX элементы)
   const ratesContent = (
@@ -41,6 +41,15 @@ export async function MetalRatesBar() {
         <PeriodicElementSymbol metal="Pd" className="text-rose-300" />
         <span>{palladium.toLocaleString("ru-RU")} ₽</span>
       </span>
+      {tantalum > 0 && (
+        <>
+          <span className="text-slate-600">•</span>
+          <span className="flex items-center gap-1">
+            <PeriodicElementSymbol metal="Ta" className="text-stone-300" />
+            <span>{tantalum.toLocaleString("ru-RU")} ₽</span>
+          </span>
+        </>
+      )}
     </>
   );
 

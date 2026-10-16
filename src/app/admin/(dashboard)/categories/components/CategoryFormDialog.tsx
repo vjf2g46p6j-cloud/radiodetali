@@ -35,6 +35,7 @@ interface FormData {
   customRateAg: string;
   customRatePt: string;
   customRatePd: string;
+  customRateTa: string;
 }
 
 type NotificationType = "success" | "error" | null;
@@ -88,6 +89,7 @@ export function CategoryFormDialog({
       customRateAg: editCategory?.customRateAg?.toString() || "",
       customRatePt: editCategory?.customRatePt?.toString() || "",
       customRatePd: editCategory?.customRatePd?.toString() || "",
+      customRateTa: editCategory?.customRateTa?.toString() || "",
     },
   });
 
@@ -105,6 +107,7 @@ export function CategoryFormDialog({
       customRateAg: editCategory?.customRateAg?.toString() || "",
       customRatePt: editCategory?.customRatePt?.toString() || "",
       customRatePd: editCategory?.customRatePd?.toString() || "",
+      customRateTa: editCategory?.customRateTa?.toString() || "",
     });
   };
 
@@ -151,6 +154,7 @@ export function CategoryFormDialog({
           customRateAg: parseRate(data.customRateAg),
           customRatePt: parseRate(data.customRatePt),
           customRatePd: parseRate(data.customRatePd),
+          customRateTa: parseRate(data.customRateTa),
         });
       } else {
         result = await createCategory({
@@ -164,6 +168,7 @@ export function CategoryFormDialog({
           customRateAg: parseRate(data.customRateAg),
           customRatePt: parseRate(data.customRatePt),
           customRatePd: parseRate(data.customRatePd),
+          customRateTa: parseRate(data.customRateTa),
         });
       }
 
@@ -500,6 +505,29 @@ export function CategoryFormDialog({
                       />
                       <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
                         ₽/мг
+                      </span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="cat-customRateTa"
+                      className="block text-sm font-medium text-slate-700 mb-1"
+                    >
+                      Ta (Тантал)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type="number"
+                        id="cat-customRateTa"
+                        step="any"
+                        min="0"
+                        {...register("customRateTa")}
+                        className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 pr-16"
+                        placeholder="—"
+                      />
+                      <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                        ₽/г
                       </span>
                     </div>
                   </div>

@@ -197,7 +197,8 @@ export function ProductDetailView({
     (product.displayContentGold > 0 ||
       product.displayContentSilver > 0 ||
       product.displayContentPlatinum > 0 ||
-      product.displayContentPalladium > 0);
+      product.displayContentPalladium > 0 ||
+      product.displayContentTantalum > 0);
 
   const hasPageDescription = !!product.pageDescription;
 
@@ -306,6 +307,7 @@ export function ProductDetailView({
               contentSilver={product.displayContentSilver}
               contentPlatinum={product.displayContentPlatinum}
               contentPalladium={product.displayContentPalladium}
+              contentTantalum={product.displayContentTantalum}
             />
           </section>
         )}

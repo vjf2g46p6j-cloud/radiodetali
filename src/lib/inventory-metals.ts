@@ -19,6 +19,7 @@ export type MetalTotals = {
   ag: number;
   pt: number;
   pd: number;
+  ta: number;
 };
 
 export type InventoryMetalProduct = {
@@ -33,24 +34,28 @@ export type InventoryMetalProduct = {
   contentSilver: number;
   contentPlatinum: number;
   contentPalladium: number;
+  contentTantalum: number;
   contentGoldUsed: number;
   contentSilverUsed: number;
   contentPlatinumUsed: number;
   contentPalladiumUsed: number;
+  contentTantalumUsed: number;
   modifications: Array<{
     id: string;
     contentAu: number;
     contentAg: number;
     contentPt: number;
     contentPd: number;
+    contentTa: number;
     contentAuUsed: number;
     contentAgUsed: number;
     contentPtUsed: number;
     contentPdUsed: number;
+    contentTaUsed: number;
   }>;
 };
 
-const EMPTY_TOTALS: MetalTotals = { au: 0, ag: 0, pt: 0, pd: 0 };
+const EMPTY_TOTALS: MetalTotals = { au: 0, ag: 0, pt: 0, pd: 0, ta: 0 };
 
 function toAmount(value: unknown): number {
   const n = Number(value);
@@ -74,6 +79,7 @@ function addScaled(
     ag: acc.ag + unit.ag * quantity,
     pt: acc.pt + unit.pt * quantity,
     pd: acc.pd + unit.pd * quantity,
+    ta: acc.ta + unit.ta * quantity,
   };
 }
 
@@ -95,6 +101,7 @@ export function resolveLineMetalContent(
         ag: toAmount(mod.contentAg),
         pt: toAmount(mod.contentPt),
         pd: toAmount(mod.contentPd),
+        ta: toAmount(mod.contentTa),
       };
     }
     return {
@@ -102,6 +109,7 @@ export function resolveLineMetalContent(
       ag: toAmount(mod.contentAgUsed),
       pt: toAmount(mod.contentPtUsed),
       pd: toAmount(mod.contentPdUsed),
+      ta: toAmount(mod.contentTaUsed),
     };
   }
 
@@ -111,6 +119,7 @@ export function resolveLineMetalContent(
       ag: toAmount(product.contentSilver),
       pt: toAmount(product.contentPlatinum),
       pd: toAmount(product.contentPalladium),
+      ta: toAmount(product.contentTantalum),
     };
   }
 
@@ -119,6 +128,7 @@ export function resolveLineMetalContent(
     ag: toAmount(product.contentSilverUsed),
     pt: toAmount(product.contentPlatinumUsed),
     pd: toAmount(product.contentPalladiumUsed),
+    ta: toAmount(product.contentTantalumUsed),
   };
 }
 
@@ -158,6 +168,7 @@ export function accumulateInventoryMetals(
       ag: newTotals.ag + usedTotals.ag,
       pt: newTotals.pt + usedTotals.pt,
       pd: newTotals.pd + usedTotals.pd,
+      ta: newTotals.ta + usedTotals.ta,
     },
   };
 }

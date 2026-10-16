@@ -3,7 +3,7 @@
  * 
  * Система единиц измерения:
  * - Золото (Au), Платина (Pl), Палладий (Pd) — в миллиграммах (мг), курсы за 1 мг
- * - Серебро (Ag) — в граммах (г), курс за 1 г
+ * - Серебро (Ag), Тантал (Ta) — в граммах (г), курс за 1 г
  * - Формула: Price = Content * Rate (универсальная, единицы должны совпадать)
  */
 
@@ -14,13 +14,14 @@
 /**
  * Глобальные курсы металлов (из таблицы MetalRate)
  * - Au, Pt, Pd — цена за 1 мг
- * - Ag — цена за 1 г
+ * - Ag, Ta — цена за 1 г
  */
 export interface MetalRates {
   gold: unknown;      // Prisma Decimal | number
   silver: unknown;
   platinum: unknown;
   palladium: unknown;
+  tantalum?: unknown;
 }
 
 /**
@@ -32,12 +33,13 @@ export interface CategoryCustomRates {
   customRateAg?: number | null;
   customRatePt?: number | null;
   customRatePd?: number | null;
+  customRateTa?: number | null;
 }
 
 /**
  * Содержание металлов в товаре
  * - Au, Pt, Pd — в мг
- * - Ag — в г
+ * - Ag, Ta — в г
  */
 export interface MetalContent {
   // Содержание для НОВЫХ товаров (мг)
@@ -45,12 +47,14 @@ export interface MetalContent {
   contentSilver: unknown;
   contentPlatinum: unknown;
   contentPalladium: unknown;
+  contentTantalum?: unknown;
   
   // Содержание для Б/У товаров (мг)
   contentGoldUsed: unknown;
   contentSilverUsed: unknown;
   contentPlatinumUsed: unknown;
   contentPalladiumUsed: unknown;
+  contentTantalumUsed?: unknown;
   
   // Флаги доступности
   isNewAvailable: boolean;
@@ -77,10 +81,12 @@ export interface ModificationContent {
   contentAg: number;
   contentPt: number;
   contentPd: number;
+  contentTa?: number;
   contentAuUsed: number;
   contentAgUsed: number;
   contentPtUsed: number;
   contentPdUsed: number;
+  contentTaUsed?: number;
 }
 
 /**
@@ -103,13 +109,14 @@ export interface ProductPrices {
 /**
  * Разрешённые курсы металлов (после применения кастомных курсов категории)
  * - Au, Pt, Pd — цена за 1 мг
- * - Ag — цена за 1 г
+ * - Ag, Ta — цена за 1 г
  */
 export interface ResolvedRates {
   gold: number;
   silver: number;
   platinum: number;
   palladium: number;
+  tantalum: number;
 }
 
 // ============================================================================
@@ -136,6 +143,7 @@ export function resolveRates(
     silver: categoryRates?.customRateAg ?? Number(globalRates.silver),
     platinum: categoryRates?.customRatePt ?? Number(globalRates.platinum),
     palladium: categoryRates?.customRatePd ?? Number(globalRates.palladium),
+    tantalum: categoryRates?.customRateTa ?? Number(globalRates.tantalum ?? 0),
   };
 }
 
@@ -147,13 +155,15 @@ export function resolveRates(
  * Рассчитывает базовую стоимость по содержанию металлов
  * 
  * Формула: Price = (Content_Au * Rate_Au) + (Content_Ag * Rate_Ag) + 
- *                  (Content_Pt * Rate_Pt) + (Content_Pd * Rate_Pd)
+ *                  (Content_Pt * Rate_Pt) + (Content_Pd * Rate_Pd) +
+ *                  (Content_Ta * Rate_Ta)
  * 
  * @param contentAu - Содержание золота (мг)
  * @param contentAg - Содержание серебра (г)
  * @param contentPt - Содержание платины (мг)
  * @param contentPd - Содержание палладия (мг)
- * @param rates - Разрешённые курсы (Au/Pt/Pd — за 1 мг, Ag — за 1 г)
+ * @param rates - Разрешённые курсы (Au/Pt/Pd — за 1 мг, Ag/Ta — за 1 г)
+ * @param contentTa - Содержание тантала (г)
  * @returns Базовая стоимость в рублях
  */
 export function calculateBasePrice(
@@ -161,19 +171,22 @@ export function calculateBasePrice(
   contentAg: unknown,
   contentPt: unknown,
   contentPd: unknown,
-  rates: ResolvedRates
+  rates: ResolvedRates,
+  contentTa: unknown = 0,
 ): number {
   const au = Number(contentAu) || 0;
   const ag = Number(contentAg) || 0;
   const pt = Number(contentPt) || 0;
   const pd = Number(contentPd) || 0;
+  const ta = Number(contentTa) || 0;
 
   // Формула: Content * Rate (универсальная)
   const price =
     au * rates.gold +
     ag * rates.silver +
     pt * rates.platinum +
-    pd * rates.palladium;
+    pd * rates.palladium +
+    ta * rates.tantalum;
 
   return Math.round(price * 100) / 100;
 }
@@ -217,7 +230,8 @@ export function calculateProductPrices(
         product.contentSilver,
         product.contentPlatinum,
         product.contentPalladium,
-        rates
+        rates,
+        product.contentTantalum,
       );
       priceNew = Math.round(basePrice * markup * 100) / 100;
     }
@@ -240,7 +254,8 @@ export function calculateProductPrices(
         product.contentSilverUsed,
         product.contentPlatinumUsed,
         product.contentPalladiumUsed,
-        rates
+        rates,
+        product.contentTantalumUsed,
       );
       // Используем markupUsed для Б/У товаров
       priceUsed = Math.round(basePrice * markupUsed * 100) / 100;
@@ -283,6 +298,7 @@ export function calculateModificationPrices(
     modification.contentPt,
     modification.contentPd,
     rates,
+    modification.contentTa,
   );
 
   const basePriceUsed = calculateBasePrice(
@@ -291,6 +307,7 @@ export function calculateModificationPrices(
     modification.contentPtUsed,
     modification.contentPdUsed,
     rates,
+    modification.contentTaUsed,
   );
 
   return {
@@ -377,14 +394,15 @@ export function formatSilverContent(content: unknown): string {
   }
 }
 
-export type MetalSymbol = "Au" | "Ag" | "Pt" | "Pd";
+export type MetalSymbol = "Au" | "Ag" | "Pt" | "Pd" | "Ta";
 
-/** Единица хранения содержания: Au/Pt/Pd — мг, Ag — г */
+/** Единица хранения содержания: Au/Pt/Pd — мг, Ag/Ta — г */
 export const METAL_CONTENT_UNITS: Record<MetalSymbol, "мг" | "г"> = {
   Au: "мг",
   Ag: "г",
   Pt: "мг",
   Pd: "мг",
+  Ta: "г",
 };
 
 /** Форматирует содержание металла с корректной единицей */
@@ -392,7 +410,7 @@ export function formatPreciousMetalContent(
   symbol: MetalSymbol,
   content: unknown
 ): string {
-  if (symbol === "Ag") {
+  if (symbol === "Ag" || symbol === "Ta") {
     return formatSilverContent(content);
   }
   return formatMetalContent(content);

@@ -7,10 +7,16 @@ type PriceGroupHint = {
   productName?: string | null;
   slug?: string | null;
   name?: string | null;
+  unitType?: "PIECE" | "GRAM" | "KG" | null;
 };
 
-/** КМ и техническое серебро: цена до сотен рублей. */
+/**
+ * До сотен рублей округляется только весовая цена КМ и технического серебра
+ * (₽/кг и ₽/г). Штучные позиции остаются как есть, иначе 1,3 и 1,35
+ * сходятся в одну цену, а мелочь вроде МЛЗ превращается в 0 ₽.
+ */
 export function shouldRoundPriceToHundred(input: PriceGroupHint): boolean {
+  if (input.unitType !== "KG" && input.unitType !== "GRAM") return false;
   const group = classifyPrintGroup(input);
   return group === "km" || group === "silver";
 }

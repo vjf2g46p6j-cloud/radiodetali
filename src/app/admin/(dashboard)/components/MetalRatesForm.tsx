@@ -15,6 +15,7 @@ interface FormData {
   silver: number;
   platinum: number;
   palladium: number;
+  tantalum: number;
 }
 
 type NotificationType = "success" | "error" | null;
@@ -36,6 +37,7 @@ export function MetalRatesForm({ initialRates }: MetalRatesFormProps) {
       silver: initialRates.silver,
       platinum: initialRates.platinum,
       palladium: initialRates.palladium,
+      tantalum: initialRates.tantalum,
     },
   });
 
@@ -66,6 +68,7 @@ export function MetalRatesForm({ initialRates }: MetalRatesFormProps) {
     { key: "silver" as const, label: "Серебро (Ag) — Цена за 1 г (₽)", symbol: "Ag", color: "slate", unit: "₽/г" },
     { key: "platinum" as const, label: `${getMetalLabel("Pt")} — Цена за 1 мг (₽)`, symbol: getMetalDisplaySymbol("Pt"), color: "cyan", unit: "₽/мг" },
     { key: "palladium" as const, label: "Палладий (Pd) — Цена за 1 мг (₽)", symbol: "Pd", color: "violet", unit: "₽/мг" },
+    { key: "tantalum" as const, label: "Тантал (Ta) — Цена за 1 г (₽)", symbol: "Ta", color: "stone", unit: "₽/г" },
   ];
 
   return (

@@ -41,10 +41,12 @@ export interface ModificationWithPrice {
   contentAg: number;
   contentPt: number;
   contentPd: number;
+  contentTa: number;
   contentAuUsed: number;
   contentAgUsed: number;
   contentPtUsed: number;
   contentPdUsed: number;
+  contentTaUsed: number;
   priceNew: number;
   priceUsed: number;
 }
@@ -58,10 +60,12 @@ export interface ModificationInput {
   contentAg?: number;
   contentPt?: number;
   contentPd?: number;
+  contentTa?: number;
   contentAuUsed?: number;
   contentAgUsed?: number;
   contentPtUsed?: number;
   contentPdUsed?: number;
+  contentTaUsed?: number;
 }
 
 /**
@@ -103,16 +107,19 @@ export interface ProductWithPrice {
   contentSilver: number;
   contentPlatinum: number;
   contentPalladium: number;
+  contentTantalum: number;
   // Содержание металлов для Б/У
   contentGoldUsed: number;
   contentSilverUsed: number;
   contentPlatinumUsed: number;
   contentPalladiumUsed: number;
+  contentTantalumUsed: number;
   // Содержание для отображения на странице товара (не влияет на цену)
   displayContentGold: number;
   displayContentSilver: number;
   displayContentPlatinum: number;
   displayContentPalladium: number;
+  displayContentTantalum: number;
   displayContentCustomized: boolean;
   showDisplayContent: boolean;
   // Настройки доступности по состоянию
@@ -161,16 +168,19 @@ export interface CreateProductInput {
   contentSilver?: number;
   contentPlatinum?: number;
   contentPalladium?: number;
+  contentTantalum?: number;
   // Содержание металлов для Б/У
   contentGoldUsed?: number;
   contentSilverUsed?: number;
   contentPlatinumUsed?: number;
   contentPalladiumUsed?: number;
+  contentTantalumUsed?: number;
   // Содержание для отображения на странице
   displayContentGold?: number;
   displayContentSilver?: number;
   displayContentPlatinum?: number;
   displayContentPalladium?: number;
+  displayContentTantalum?: number;
   displayContentCustomized?: boolean;
   showDisplayContent?: boolean;
   isNewAvailable?: boolean;
@@ -211,16 +221,19 @@ export interface UpdateProductInput {
   contentSilver?: number;
   contentPlatinum?: number;
   contentPalladium?: number;
+  contentTantalum?: number;
   // Содержание металлов для Б/У
   contentGoldUsed?: number;
   contentSilverUsed?: number;
   contentPlatinumUsed?: number;
   contentPalladiumUsed?: number;
+  contentTantalumUsed?: number;
   // Содержание для отображения на странице
   displayContentGold?: number;
   displayContentSilver?: number;
   displayContentPlatinum?: number;
   displayContentPalladium?: number;
+  displayContentTantalum?: number;
   displayContentCustomized?: boolean;
   showDisplayContent?: boolean;
   isNewAvailable?: boolean;
@@ -272,6 +285,7 @@ interface DbProductWithCategory {
     customRateAg: number | null;
     customRatePt: number | null;
     customRatePd: number | null;
+    customRateTa: number | null;
   };
   sortOrder: number;
   // Единица измерения
@@ -293,25 +307,30 @@ interface DbProductWithCategory {
     contentAg: number;
     contentPt: number;
     contentPd: number;
+    contentTa: number;
     contentAuUsed: number;
     contentAgUsed: number;
     contentPtUsed: number;
     contentPdUsed: number;
+    contentTaUsed: number;
   }[];
   // Содержание металлов для НОВЫХ
   contentGold: unknown; // Prisma Decimal
   contentSilver: unknown;
   contentPlatinum: unknown;
   contentPalladium: unknown;
+  contentTantalum: unknown;
   // Содержание металлов для Б/У
   contentGoldUsed: unknown;
   contentSilverUsed: unknown;
   contentPlatinumUsed: unknown;
   contentPalladiumUsed: unknown;
+  contentTantalumUsed: unknown;
   displayContentGold: unknown;
   displayContentSilver: unknown;
   displayContentPlatinum: unknown;
   displayContentPalladium: unknown;
+  displayContentTantalum: unknown;
   displayContentCustomized: boolean;
   showDisplayContent: boolean;
   isNewAvailable: boolean;
@@ -330,6 +349,7 @@ interface RatesForCalculation {
   silver: unknown;
   platinum: unknown;
   palladium: unknown;
+  tantalum?: unknown;
 }
 
 // ============================================================================
@@ -359,8 +379,9 @@ function hasAnyMetalContent(
   silver: number,
   platinum: number,
   palladium: number,
+  tantalum: number = 0,
 ): boolean {
-  return gold > 0 || silver > 0 || platinum > 0 || palladium > 0;
+  return gold > 0 || silver > 0 || platinum > 0 || palladium > 0 || tantalum > 0;
 }
 
 function hasFixedManualPrice(input: {
@@ -384,10 +405,12 @@ function resolveDisplayMetalContent(product: {
   contentSilver: unknown;
   contentPlatinum: unknown;
   contentPalladium: unknown;
+  contentTantalum: unknown;
   displayContentGold: unknown;
   displayContentSilver: unknown;
   displayContentPlatinum: unknown;
   displayContentPalladium: unknown;
+  displayContentTantalum: unknown;
   displayContentCustomized: boolean;
   manualPriceNew: unknown | null;
   manualPriceUsed: unknown | null;
@@ -397,19 +420,21 @@ function resolveDisplayMetalContent(product: {
     silver: toNumber(product.contentSilver),
     platinum: toNumber(product.contentPlatinum),
     palladium: toNumber(product.contentPalladium),
+    tantalum: toNumber(product.contentTantalum),
   };
   const stored = {
     gold: toNumber(product.displayContentGold),
     silver: toNumber(product.displayContentSilver),
     platinum: toNumber(product.displayContentPlatinum),
     palladium: toNumber(product.displayContentPalladium),
+    tantalum: toNumber(product.displayContentTantalum),
   };
 
   if (product.displayContentCustomized) {
     return stored;
   }
 
-  if (hasAnyMetalContent(stored.gold, stored.silver, stored.platinum, stored.palladium)) {
+  if (hasAnyMetalContent(stored.gold, stored.silver, stored.platinum, stored.palladium, stored.tantalum)) {
     return stored;
   }
 
@@ -432,10 +457,12 @@ function buildDisplayContentForSave(input: {
   contentSilver?: number;
   contentPlatinum?: number;
   contentPalladium?: number;
+  contentTantalum?: number;
   displayContentGold?: number;
   displayContentSilver?: number;
   displayContentPlatinum?: number;
   displayContentPalladium?: number;
+  displayContentTantalum?: number;
   displayContentCustomized?: boolean;
   manualPriceNew?: number | null;
   manualPriceUsed?: number | null;
@@ -445,12 +472,14 @@ function buildDisplayContentForSave(input: {
     silver: normalizeMetalInput(input.displayContentSilver),
     platinum: normalizeMetalInput(input.displayContentPlatinum),
     palladium: normalizeMetalInput(input.displayContentPalladium),
+    tantalum: normalizeMetalInput(input.displayContentTantalum),
   };
   const pricing = {
     gold: normalizeMetalInput(input.contentGold),
     silver: normalizeMetalInput(input.contentSilver),
     platinum: normalizeMetalInput(input.contentPlatinum),
     palladium: normalizeMetalInput(input.contentPalladium),
+    tantalum: normalizeMetalInput(input.contentTantalum),
   };
 
   if (input.displayContentCustomized) {
@@ -459,6 +488,7 @@ function buildDisplayContentForSave(input: {
       displayContentSilver: display.silver,
       displayContentPlatinum: display.platinum,
       displayContentPalladium: display.palladium,
+      displayContentTantalum: display.tantalum,
       displayContentCustomized: true as const,
     };
   }
@@ -469,12 +499,14 @@ function buildDisplayContentForSave(input: {
     pricing.silver,
     pricing.platinum,
     pricing.palladium,
+    pricing.tantalum,
   );
   const displayHasContent = hasAnyMetalContent(
     display.gold,
     display.silver,
     display.platinum,
     display.palladium,
+    display.tantalum,
   );
 
   // Фиксированная цена без расчётного содержания — сохраняем только отображаемое
@@ -484,6 +516,7 @@ function buildDisplayContentForSave(input: {
       displayContentSilver: display.silver,
       displayContentPlatinum: display.platinum,
       displayContentPalladium: display.palladium,
+      displayContentTantalum: display.tantalum,
       displayContentCustomized: displayHasContent,
     };
   }
@@ -493,6 +526,7 @@ function buildDisplayContentForSave(input: {
     displayContentSilver: pricing.silver,
     displayContentPlatinum: pricing.platinum,
     displayContentPalladium: pricing.palladium,
+    displayContentTantalum: pricing.tantalum,
     displayContentCustomized: false as const,
   };
 }
@@ -516,6 +550,7 @@ function serializeProduct(
     customRateAg: product.category.customRateAg,
     customRatePt: product.category.customRatePt,
     customRatePd: product.category.customRatePd,
+    customRateTa: product.category.customRateTa,
   };
   
   const priceHint = {
@@ -523,6 +558,7 @@ function serializeProduct(
     categoryName: product.category.name,
     productSlug: product.slug,
     productName: product.name,
+    unitType: product.unitType,
   };
 
   const { priceNew, priceUsed } = calculateProductPrices(
@@ -531,10 +567,12 @@ function serializeProduct(
       contentSilver: product.contentSilver,
       contentPlatinum: product.contentPlatinum,
       contentPalladium: product.contentPalladium,
+      contentTantalum: product.contentTantalum,
       contentGoldUsed: product.contentGoldUsed,
       contentSilverUsed: product.contentSilverUsed,
       contentPlatinumUsed: product.contentPlatinumUsed,
       contentPalladiumUsed: product.contentPalladiumUsed,
+      contentTantalumUsed: product.contentTantalumUsed,
       isNewAvailable: product.isNewAvailable,
       isUsedAvailable: product.isUsedAvailable,
       manualPriceNew: product.manualPriceNew,
@@ -555,10 +593,12 @@ function serializeProduct(
         contentAg: mod.contentAg,
         contentPt: mod.contentPt,
         contentPd: mod.contentPd,
+        contentTa: mod.contentTa,
         contentAuUsed: mod.contentAuUsed,
         contentAgUsed: mod.contentAgUsed,
         contentPtUsed: mod.contentPtUsed,
         contentPdUsed: mod.contentPdUsed,
+        contentTaUsed: mod.contentTaUsed,
       },
       rates,
       categoryRates,
@@ -572,10 +612,12 @@ function serializeProduct(
       contentAg: mod.contentAg,
       contentPt: mod.contentPt,
       contentPd: mod.contentPd,
+      contentTa: mod.contentTa,
       contentAuUsed: mod.contentAuUsed,
       contentAgUsed: mod.contentAgUsed,
       contentPtUsed: mod.contentPtUsed,
       contentPdUsed: mod.contentPdUsed,
+      contentTaUsed: mod.contentTaUsed,
       priceNew: applyHundredPrice(modPrices.priceNew, priceHint) ?? modPrices.priceNew,
       priceUsed: applyHundredPrice(modPrices.priceUsed, priceHint) ?? modPrices.priceUsed,
     };
@@ -608,10 +650,12 @@ function serializeProduct(
     contentSilver: toNumber(product.contentSilver),
     contentPlatinum: toNumber(product.contentPlatinum),
     contentPalladium: toNumber(product.contentPalladium),
+    contentTantalum: toNumber(product.contentTantalum),
     contentGoldUsed: toNumber(product.contentGoldUsed),
     contentSilverUsed: toNumber(product.contentSilverUsed),
     contentPlatinumUsed: toNumber(product.contentPlatinumUsed),
     contentPalladiumUsed: toNumber(product.contentPalladiumUsed),
+    contentTantalumUsed: toNumber(product.contentTantalumUsed),
     ...(() => {
       const display = resolveDisplayMetalContent(product);
       return {
@@ -619,6 +663,7 @@ function serializeProduct(
         displayContentSilver: display.silver,
         displayContentPlatinum: display.platinum,
         displayContentPalladium: display.palladium,
+        displayContentTantalum: display.tantalum,
       };
     })(),
     displayContentCustomized: product.displayContentCustomized,
@@ -641,6 +686,7 @@ const DEFAULT_RATES: RatesForCalculation = {
   silver: 85,
   platinum: 3200,
   palladium: 3800,
+  tantalum: 0,
 };
 
 /** Дефолтный коэффициент наценки */
@@ -875,6 +921,7 @@ export async function getProducts(
                 customRateAg: true,
                 customRatePt: true,
                 customRatePd: true,
+                customRateTa: true,
               },
             },
             modifications: true,
@@ -985,6 +1032,7 @@ export async function getProducts(
               customRateAg: true,
               customRatePt: true,
               customRatePd: true,
+                customRateTa: true,
             },
           },
           modifications: true,
@@ -1066,6 +1114,7 @@ export async function getProductById(id: string): Promise<ProductResult> {
               customRateAg: true,
               customRatePt: true,
               customRatePd: true,
+                customRateTa: true,
             },
           },
           modifications: true,
@@ -1113,6 +1162,7 @@ export async function getProductBySlug(slug: string): Promise<ProductResult> {
               customRateAg: true,
               customRatePt: true,
               customRatePd: true,
+                customRateTa: true,
             },
           },
           modifications: true,
@@ -1226,10 +1276,12 @@ export async function createProduct(
                 contentAg: m.contentAg ?? 0,
                 contentPt: m.contentPt ?? 0,
                 contentPd: m.contentPd ?? 0,
+                contentTa: m.contentTa ?? 0,
                 contentAuUsed: m.contentAuUsed ?? 0,
                 contentAgUsed: m.contentAgUsed ?? 0,
                 contentPtUsed: m.contentPtUsed ?? 0,
                 contentPdUsed: m.contentPdUsed ?? 0,
+                contentTaUsed: m.contentTaUsed ?? 0,
               })),
             },
           },
@@ -1239,11 +1291,13 @@ export async function createProduct(
         contentSilver: (input.contentSilver == null || Number.isNaN(input.contentSilver)) ? 0 : input.contentSilver,
         contentPlatinum: (input.contentPlatinum == null || Number.isNaN(input.contentPlatinum)) ? 0 : input.contentPlatinum,
         contentPalladium: (input.contentPalladium == null || Number.isNaN(input.contentPalladium)) ? 0 : input.contentPalladium,
+        contentTantalum: (input.contentTantalum == null || Number.isNaN(input.contentTantalum)) ? 0 : input.contentTantalum,
         // Содержание металлов для Б/У (обрабатываем null и NaN как 0)
         contentGoldUsed: (input.contentGoldUsed == null || Number.isNaN(input.contentGoldUsed)) ? 0 : input.contentGoldUsed,
         contentSilverUsed: (input.contentSilverUsed == null || Number.isNaN(input.contentSilverUsed)) ? 0 : input.contentSilverUsed,
         contentPlatinumUsed: (input.contentPlatinumUsed == null || Number.isNaN(input.contentPlatinumUsed)) ? 0 : input.contentPlatinumUsed,
         contentPalladiumUsed: (input.contentPalladiumUsed == null || Number.isNaN(input.contentPalladiumUsed)) ? 0 : input.contentPalladiumUsed,
+        contentTantalumUsed: (input.contentTantalumUsed == null || Number.isNaN(input.contentTantalumUsed)) ? 0 : input.contentTantalumUsed,
         ...buildDisplayContentForSave(input),
         showDisplayContent: input.showDisplayContent ?? true,
         isNewAvailable: input.isNewAvailable ?? true,
@@ -1261,6 +1315,7 @@ export async function createProduct(
             customRateAg: true,
             customRatePt: true,
             customRatePd: true,
+                customRateTa: true,
           },
         },
         modifications: true,
@@ -1367,11 +1422,13 @@ export async function updateProduct(
     if (input.contentSilver !== undefined) updateData.contentSilver = (input.contentSilver == null || Number.isNaN(input.contentSilver)) ? 0 : input.contentSilver;
     if (input.contentPlatinum !== undefined) updateData.contentPlatinum = (input.contentPlatinum == null || Number.isNaN(input.contentPlatinum)) ? 0 : input.contentPlatinum;
     if (input.contentPalladium !== undefined) updateData.contentPalladium = (input.contentPalladium == null || Number.isNaN(input.contentPalladium)) ? 0 : input.contentPalladium;
+    if (input.contentTantalum !== undefined) updateData.contentTantalum = (input.contentTantalum == null || Number.isNaN(input.contentTantalum)) ? 0 : input.contentTantalum;
     // Б/У - обрабатываем null и NaN как 0
     if (input.contentGoldUsed !== undefined) updateData.contentGoldUsed = (input.contentGoldUsed == null || Number.isNaN(input.contentGoldUsed)) ? 0 : input.contentGoldUsed;
     if (input.contentSilverUsed !== undefined) updateData.contentSilverUsed = (input.contentSilverUsed == null || Number.isNaN(input.contentSilverUsed)) ? 0 : input.contentSilverUsed;
     if (input.contentPlatinumUsed !== undefined) updateData.contentPlatinumUsed = (input.contentPlatinumUsed == null || Number.isNaN(input.contentPlatinumUsed)) ? 0 : input.contentPlatinumUsed;
     if (input.contentPalladiumUsed !== undefined) updateData.contentPalladiumUsed = (input.contentPalladiumUsed == null || Number.isNaN(input.contentPalladiumUsed)) ? 0 : input.contentPalladiumUsed;
+    if (input.contentTantalumUsed !== undefined) updateData.contentTantalumUsed = (input.contentTantalumUsed == null || Number.isNaN(input.contentTantalumUsed)) ? 0 : input.contentTantalumUsed;
 
     if (input.showDisplayContent !== undefined) updateData.showDisplayContent = input.showDisplayContent;
 
@@ -1384,7 +1441,9 @@ export async function updateProduct(
       input.contentGold !== undefined ||
       input.contentSilver !== undefined ||
       input.contentPlatinum !== undefined ||
-      input.contentPalladium !== undefined;
+      input.contentPalladium !== undefined ||
+      input.contentTantalum !== undefined ||
+      input.displayContentTantalum !== undefined;
 
     if (shouldSyncDisplay) {
       Object.assign(
@@ -1406,6 +1465,10 @@ export async function updateProduct(
             input.contentPalladium !== undefined
               ? normalizeMetalInput(input.contentPalladium)
               : toNumber(existingProduct.contentPalladium),
+          contentTantalum:
+            input.contentTantalum !== undefined
+              ? normalizeMetalInput(input.contentTantalum)
+              : toNumber(existingProduct.contentTantalum),
           displayContentGold:
             input.displayContentGold !== undefined
               ? input.displayContentGold
@@ -1422,6 +1485,10 @@ export async function updateProduct(
             input.displayContentPalladium !== undefined
               ? input.displayContentPalladium
               : toNumber(existingProduct.displayContentPalladium),
+          displayContentTantalum:
+            input.displayContentTantalum !== undefined
+              ? input.displayContentTantalum
+              : toNumber(existingProduct.displayContentTantalum),
           displayContentCustomized:
             input.displayContentCustomized ?? existingProduct.displayContentCustomized,
           manualPriceNew:
@@ -1463,10 +1530,12 @@ export async function updateProduct(
                 contentAg: m.contentAg ?? 0,
                 contentPt: m.contentPt ?? 0,
                 contentPd: m.contentPd ?? 0,
+                contentTa: m.contentTa ?? 0,
                 contentAuUsed: m.contentAuUsed ?? 0,
                 contentAgUsed: m.contentAgUsed ?? 0,
                 contentPtUsed: m.contentPtUsed ?? 0,
                 contentPdUsed: m.contentPdUsed ?? 0,
+                contentTaUsed: m.contentTaUsed ?? 0,
               })),
             },
           },
@@ -1482,6 +1551,7 @@ export async function updateProduct(
             customRateAg: true,
             customRatePt: true,
             customRatePd: true,
+                customRateTa: true,
           },
         },
         modifications: true,
@@ -1584,6 +1654,7 @@ export async function getProductsByIds(ids: string[]): Promise<ProductsResult> {
               customRateAg: true,
               customRatePt: true,
               customRatePd: true,
+                customRateTa: true,
             },
           },
           modifications: true,

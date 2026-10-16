@@ -39,6 +39,7 @@ const DISPLAY_METAL_FIELDS = [
   { key: "displayContentSilver" as const, label: "Серебро", symbol: "Ag", unit: "г" },
   { key: "displayContentPlatinum" as const, label: "Платина", symbol: getMetalDisplaySymbol("Pt"), unit: "мг" },
   { key: "displayContentPalladium" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
+  { key: "displayContentTantalum" as const, label: "Тантал", symbol: "Ta", unit: "г" },
 ];
 
 interface ProductFormProps {
@@ -74,15 +75,18 @@ interface FormData {
   contentSilver: number;
   contentPlatinum: number;
   contentPalladium: number;
+  contentTantalum: number;
   // Содержание металлов для Б/У
   contentGoldUsed: number;
   contentSilverUsed: number;
   contentPlatinumUsed: number;
   contentPalladiumUsed: number;
+  contentTantalumUsed: number;
   displayContentGold: number;
   displayContentSilver: number;
   displayContentPlatinum: number;
   displayContentPalladium: number;
+  displayContentTantalum: number;
   displayContentCustomized: boolean;
   showDisplayContent: boolean;
   isNewAvailable: boolean;
@@ -98,10 +102,12 @@ interface FormData {
     contentAg: number;
     contentPt: number;
     contentPd: number;
+    contentTa: number;
     contentAuUsed: number;
     contentAgUsed: number;
     contentPtUsed: number;
     contentPdUsed: number;
+    contentTaUsed: number;
   }[];
 }
 
@@ -173,15 +179,18 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
       contentSilver: product?.contentSilver || 0,
       contentPlatinum: product?.contentPlatinum || 0,
       contentPalladium: product?.contentPalladium || 0,
+      contentTantalum: product?.contentTantalum || 0,
       // Содержание металлов для Б/У
       contentGoldUsed: product?.contentGoldUsed || 0,
       contentSilverUsed: product?.contentSilverUsed || 0,
       contentPlatinumUsed: product?.contentPlatinumUsed || 0,
       contentPalladiumUsed: product?.contentPalladiumUsed || 0,
+      contentTantalumUsed: product?.contentTantalumUsed || 0,
       displayContentGold: product?.displayContentGold ?? product?.contentGold ?? 0,
       displayContentSilver: product?.displayContentSilver ?? product?.contentSilver ?? 0,
       displayContentPlatinum: product?.displayContentPlatinum ?? product?.contentPlatinum ?? 0,
       displayContentPalladium: product?.displayContentPalladium ?? product?.contentPalladium ?? 0,
+      displayContentTantalum: product?.displayContentTantalum ?? product?.contentTantalum ?? 0,
       displayContentCustomized: product?.displayContentCustomized ?? false,
       showDisplayContent: product?.showDisplayContent ?? true,
       isNewAvailable: product?.isNewAvailable ?? true,
@@ -197,10 +206,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
         contentAg: m.contentAg,
         contentPt: m.contentPt,
         contentPd: m.contentPd,
+        contentTa: m.contentTa,
         contentAuUsed: m.contentAuUsed,
         contentAgUsed: m.contentAgUsed,
         contentPtUsed: m.contentPtUsed,
         contentPdUsed: m.contentPdUsed,
+        contentTaUsed: m.contentTaUsed,
       })) ?? [],
     },
   });
@@ -234,10 +245,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
   const watchContentSilver = watch("contentSilver");
   const watchContentPlatinum = watch("contentPlatinum");
   const watchContentPalladium = watch("contentPalladium");
+  const watchContentTantalum = watch("contentTantalum");
   const watchContentGoldUsed = watch("contentGoldUsed");
   const watchContentSilverUsed = watch("contentSilverUsed");
   const watchContentPlatinumUsed = watch("contentPlatinumUsed");
   const watchContentPalladiumUsed = watch("contentPalladiumUsed");
+  const watchContentTantalumUsed = watch("contentTantalumUsed");
   const watchDisplayContentCustomized = watch("displayContentCustomized");
   const watchManualPriceNew = watch("manualPriceNew");
   const watchManualPriceUsed = watch("manualPriceUsed");
@@ -257,11 +270,13 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
     setValue("displayContentSilver", watchContentSilver ?? 0);
     setValue("displayContentPlatinum", watchContentPlatinum ?? 0);
     setValue("displayContentPalladium", watchContentPalladium ?? 0);
+    setValue("displayContentTantalum", watchContentTantalum ?? 0);
   }, [
     watchContentGold,
     watchContentSilver,
     watchContentPlatinum,
     watchContentPalladium,
+    watchContentTantalum,
     watchDisplayContentCustomized,
     watchHasModifications,
     hasFixedPrice,
@@ -273,6 +288,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
     setValue("displayContentSilver", watchContentSilver ?? 0);
     setValue("displayContentPlatinum", watchContentPlatinum ?? 0);
     setValue("displayContentPalladium", watchContentPalladium ?? 0);
+    setValue("displayContentTantalum", watchContentTantalum ?? 0);
     setValue("displayContentCustomized", false);
   };
 
@@ -289,16 +305,18 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
     const rateAg = selectedCategory?.customRateAg ?? metalRates.silver;
     const ratePt = selectedCategory?.customRatePt ?? metalRates.platinum;
     const ratePd = selectedCategory?.customRatePd ?? metalRates.palladium;
+    const rateTa = selectedCategory?.customRateTa ?? metalRates.tantalum;
     
     const markup = watchPriceMarkup || 1.0;
     const markupUsed = watchPriceMarkupUsed || 1.0;
     
-    // Цена за НОВОЕ (Au/Pt/Pd — мг*руб/мг, Ag — г*руб/г)
+    // Цена за НОВОЕ (Au/Pt/Pd — мг*руб/мг, Ag/Ta — г*руб/г)
     const priceNew = (
       (watchContentGold || 0) * rateAu +
       (watchContentSilver || 0) * rateAg +
       (watchContentPlatinum || 0) * ratePt +
-      (watchContentPalladium || 0) * ratePd
+      (watchContentPalladium || 0) * ratePd +
+      (watchContentTantalum || 0) * rateTa
     ) * markup;
     
     // Цена за Б/У (используем markupUsed)
@@ -306,13 +324,15 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
       (watchContentGoldUsed || 0) * rateAu +
       (watchContentSilverUsed || 0) * rateAg +
       (watchContentPlatinumUsed || 0) * ratePt +
-      (watchContentPalladiumUsed || 0) * ratePd
+      (watchContentPalladiumUsed || 0) * ratePd +
+      (watchContentTantalumUsed || 0) * rateTa
     ) * markupUsed;
     
     const roundToHundred = shouldRoundPriceToHundred({
       categorySlug: selectedCategory?.slug,
       categoryName: selectedCategory?.name,
       productName: watchName,
+      unitType: watchUnitType,
     });
 
     return {
@@ -323,16 +343,19 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
     metalRates,
     selectedCategory,
     watchName,
+    watchUnitType,
     watchPriceMarkup,
     watchPriceMarkupUsed,
     watchContentGold,
     watchContentSilver,
     watchContentPlatinum,
     watchContentPalladium,
+    watchContentTantalum,
     watchContentGoldUsed,
     watchContentSilverUsed,
     watchContentPlatinumUsed,
     watchContentPalladiumUsed,
+    watchContentTantalumUsed,
   ]);
 
   // Проверяем, используются ли кастомные курсы для выбранной категории
@@ -342,7 +365,8 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
       selectedCategory.customRateAu !== null ||
       selectedCategory.customRateAg !== null ||
       selectedCategory.customRatePt !== null ||
-      selectedCategory.customRatePd !== null
+      selectedCategory.customRatePd !== null ||
+      selectedCategory.customRateTa !== null
     );
   }, [selectedCategory]);
 
@@ -453,14 +477,17 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           contentSilver: data.contentSilver,
           contentPlatinum: data.contentPlatinum,
           contentPalladium: data.contentPalladium,
+          contentTantalum: data.contentTantalum,
           contentGoldUsed: data.contentGoldUsed,
           contentSilverUsed: data.contentSilverUsed,
           contentPlatinumUsed: data.contentPlatinumUsed,
           contentPalladiumUsed: data.contentPalladiumUsed,
+          contentTantalumUsed: data.contentTantalumUsed,
           displayContentGold: data.displayContentGold,
           displayContentSilver: data.displayContentSilver,
           displayContentPlatinum: data.displayContentPlatinum,
           displayContentPalladium: data.displayContentPalladium,
+          displayContentTantalum: data.displayContentTantalum,
           displayContentCustomized: data.displayContentCustomized,
           showDisplayContent: data.showDisplayContent,
           isNewAvailable,
@@ -493,14 +520,17 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
           contentSilver: data.contentSilver,
           contentPlatinum: data.contentPlatinum,
           contentPalladium: data.contentPalladium,
+          contentTantalum: data.contentTantalum,
           contentGoldUsed: data.contentGoldUsed,
           contentSilverUsed: data.contentSilverUsed,
           contentPlatinumUsed: data.contentPlatinumUsed,
           contentPalladiumUsed: data.contentPalladiumUsed,
+          contentTantalumUsed: data.contentTantalumUsed,
           displayContentGold: data.displayContentGold,
           displayContentSilver: data.displayContentSilver,
           displayContentPlatinum: data.displayContentPlatinum,
           displayContentPalladium: data.displayContentPalladium,
+          displayContentTantalum: data.displayContentTantalum,
           displayContentCustomized: data.displayContentCustomized,
           showDisplayContent: data.showDisplayContent,
           isNewAvailable,
@@ -1085,10 +1115,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                     contentAg: 0,
                     contentPt: 0,
                     contentPd: 0,
+                    contentTa: 0,
                     contentAuUsed: 0,
                     contentAgUsed: 0,
                     contentPtUsed: 0,
                     contentPdUsed: 0,
+                    contentTaUsed: 0,
                   })}
                   className="inline-flex items-center gap-1.5 px-3 py-2 bg-cyan-600 text-white text-sm rounded-lg hover:bg-cyan-700 transition-colors"
                 >
@@ -1146,6 +1178,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                             { key: "contentAg" as const, symbol: "Ag", unit: "г" },
                             { key: "contentPt" as const, symbol: getMetalDisplaySymbol("Pt"), unit: "мг" },
                             { key: "contentPd" as const, symbol: "Pd", unit: "мг" },
+                            { key: "contentTa" as const, symbol: "Ta", unit: "г" },
                           ].map((metal) => (
                             <div key={metal.key}>
                               <label className="block text-xs text-slate-500 mb-0.5">
@@ -1174,6 +1207,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                               { key: "contentAgUsed" as const, symbol: "Ag", unit: "г" },
                               { key: "contentPtUsed" as const, symbol: getMetalDisplaySymbol("Pt"), unit: "мг" },
                               { key: "contentPdUsed" as const, symbol: "Pd", unit: "мг" },
+                              { key: "contentTaUsed" as const, symbol: "Ta", unit: "г" },
                             ].map((metal) => (
                               <div key={metal.key}>
                                 <label className="block text-xs text-slate-500 mb-0.5">
@@ -1207,10 +1241,12 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                       contentAg: 0,
                       contentPt: 0,
                       contentPd: 0,
+                      contentTa: 0,
                       contentAuUsed: 0,
                       contentAgUsed: 0,
                       contentPtUsed: 0,
                       contentPdUsed: 0,
+                      contentTaUsed: 0,
                     })}
                     className="inline-flex items-center gap-1.5 px-4 py-2 text-cyan-700 bg-cyan-50 border border-cyan-200 text-sm rounded-lg hover:bg-cyan-100 transition-colors"
                   >
@@ -1258,6 +1294,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                     { key: "contentSilver" as const, label: "Серебро", symbol: "Ag", unit: "г" },
                     { key: "contentPlatinum" as const, label: "Платина", symbol: getMetalDisplaySymbol("Pt"), unit: "мг" },
                     { key: "contentPalladium" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
+                    { key: "contentTantalum" as const, label: "Тантал", symbol: "Ta", unit: "г" },
                   ].map((metal) => (
                     <div key={metal.key}>
                       <label
@@ -1333,6 +1370,7 @@ export function ProductForm({ product, categories, metalRates, defaultCategoryId
                       { key: "contentSilverUsed" as const, label: "Серебро", symbol: "Ag", unit: "г" },
                       { key: "contentPlatinumUsed" as const, label: "Платина", symbol: getMetalDisplaySymbol("Pt"), unit: "мг" },
                       { key: "contentPalladiumUsed" as const, label: "Палладий", symbol: "Pd", unit: "мг" },
+                      { key: "contentTantalumUsed" as const, label: "Тантал", symbol: "Ta", unit: "г" },
                     ].map((metal) => (
                       <div key={metal.key}>
                         <label

@@ -158,6 +158,7 @@ export interface CategoryData {
   customRateAg: number | null;
   customRatePt: number | null;
   customRatePd: number | null;
+  customRateTa: number | null;
   productCount: number;
   childrenCount?: number;
   createdAt: Date;
@@ -196,6 +197,7 @@ export interface CreateCategoryInput {
   customRateAg?: number | null;
   customRatePt?: number | null;
   customRatePd?: number | null;
+  customRateTa?: number | null;
 }
 
 /**
@@ -231,6 +233,7 @@ export interface UpdateCategoryInput {
   customRateAg?: number | null;
   customRatePt?: number | null;
   customRatePd?: number | null;
+  customRateTa?: number | null;
 }
 
 /**
@@ -348,6 +351,7 @@ export async function getCategories(rootOnly: boolean = false): Promise<Categori
         customRateAg: cat.customRateAg,
         customRatePt: cat.customRatePt,
         customRatePd: cat.customRatePd,
+      customRateTa: cat.customRateTa,
         productCount: ownProducts + childrenProducts,
         createdAt: cat.createdAt,
         updatedAt: cat.updatedAt,
@@ -404,6 +408,7 @@ export async function getCategoryBySlug(slug: string): Promise<CategoryResult> {
         customRateAg: category.customRateAg,
         customRatePt: category.customRatePt,
         customRatePd: category.customRatePd,
+        customRateTa: category.customRateTa,
         productCount: category._count.products,
         createdAt: category.createdAt,
         updatedAt: category.updatedAt,
@@ -454,6 +459,7 @@ export async function getCategoryById(id: string): Promise<CategoryResult> {
         customRateAg: category.customRateAg,
         customRatePt: category.customRatePt,
         customRatePd: category.customRatePd,
+        customRateTa: category.customRateTa,
         productCount: category._count.products,
         createdAt: category.createdAt,
         updatedAt: category.updatedAt,
@@ -531,6 +537,7 @@ export async function createCategory(
         customRateAg: input.customRateAg ?? null,
         customRatePt: input.customRatePt ?? null,
         customRatePd: input.customRatePd ?? null,
+        customRateTa: input.customRateTa ?? null,
       },
       include: {
         parent: { select: { name: true } },
@@ -559,6 +566,7 @@ export async function createCategory(
         customRateAg: category.customRateAg,
         customRatePt: category.customRatePt,
         customRatePd: category.customRatePd,
+        customRateTa: category.customRateTa,
         productCount: category._count.products,
         createdAt: category.createdAt,
         updatedAt: category.updatedAt,
@@ -627,6 +635,7 @@ export async function updateCategory(
       customRateAg?: number | null;
       customRatePt?: number | null;
       customRatePd?: number | null;
+  customRateTa?: number | null;
       parent?: { connect: { id: string } } | { disconnect: true };
     } = {};
     
@@ -641,6 +650,7 @@ export async function updateCategory(
     if (input.customRateAg !== undefined) updateData.customRateAg = input.customRateAg;
     if (input.customRatePt !== undefined) updateData.customRatePt = input.customRatePt;
     if (input.customRatePd !== undefined) updateData.customRatePd = input.customRatePd;
+    if (input.customRateTa !== undefined) updateData.customRateTa = input.customRateTa;
     Object.assign(updateData, pickBannerInput(input), pickInfoPageInput(input));
     if (input.parentId !== undefined) {
       if (input.parentId === null) {
@@ -687,6 +697,7 @@ export async function updateCategory(
         customRateAg: category.customRateAg,
         customRatePt: category.customRatePt,
         customRatePd: category.customRatePd,
+        customRateTa: category.customRateTa,
         productCount: category._count.products,
         createdAt: category.createdAt,
         updatedAt: category.updatedAt,
@@ -830,11 +841,13 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
             contentSilver: true,
             contentPlatinum: true,
             contentPalladium: true,
+            contentTantalum: true,
             // Ð¡Ð¾Ð´ÐµÑ€Ð¶Ð°Ð½Ð¸Ðµ Ð¼ÐµÑ‚Ð°Ð»Ð»Ð¾Ð² Ð´Ð»Ñ Ð‘/Ð£
             contentGoldUsed: true,
             contentSilverUsed: true,
             contentPlatinumUsed: true,
             contentPalladiumUsed: true,
+            contentTantalumUsed: true,
             // Ð”Ð¾ÑÑ‚ÑƒÐ¿Ð½Ð¾ÑÑ‚ÑŒ
             isNewAvailable: true,
             isUsedAvailable: true,
@@ -861,6 +874,7 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
             customRateAg: true,
             customRatePt: true,
             customRatePd: true,
+            customRateTa: true,
             products: {
               select: {
                 id: true,
@@ -873,10 +887,12 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
                 contentSilver: true,
                 contentPlatinum: true,
                 contentPalladium: true,
+            contentTantalum: true,
                 contentGoldUsed: true,
                 contentSilverUsed: true,
                 contentPlatinumUsed: true,
                 contentPalladiumUsed: true,
+            contentTantalumUsed: true,
                 isNewAvailable: true,
                 isUsedAvailable: true,
                 isSingleType: true,
@@ -909,6 +925,7 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
         customRateAg: category.customRateAg,
         customRatePt: category.customRatePt,
         customRatePd: category.customRatePd,
+        customRateTa: category.customRateTa,
       };
       
       // Ð¢Ð¾Ð²Ð°Ñ€Ñ‹ Ð¸Ð· Ñ€Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒÑÐºÐ¾Ð¹ ÐºÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ð¸ + Ð¸Ð½Ñ„Ð¾Ñ€Ð¼Ð°Ñ†Ð¸Ñ Ð¾ ÐºÑƒÑ€ÑÐ°Ñ…
@@ -930,6 +947,7 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
             customRateAg: child.customRateAg,
             customRatePt: child.customRatePt,
             customRatePd: child.customRatePd,
+            customRateTa: child.customRateTa,
           },
         }))
       );
@@ -958,7 +976,8 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
           } else {
             const basePrice = calculateBasePrice(
               product.contentGold, product.contentSilver,
-              product.contentPlatinum, product.contentPalladium, rates
+              product.contentPlatinum, product.contentPalladium, rates,
+              product.contentTantalum
             );
             priceNew = Math.round(basePrice * effectiveMarkup * 100) / 100;
           }
@@ -971,7 +990,8 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
           } else {
             const basePriceUsed = calculateBasePrice(
               product.contentGoldUsed, product.contentSilverUsed,
-              product.contentPlatinumUsed, product.contentPalladiumUsed, rates
+              product.contentPlatinumUsed, product.contentPalladiumUsed, rates,
+              product.contentTantalumUsed
             );
             priceUsed = Math.round(basePriceUsed * effectiveMarkupUsed * 100) / 100;
           }
@@ -1014,6 +1034,7 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
           categoryName: chosenProduct.categoryName,
           productSlug: chosenProduct.slug,
           productName: chosenProduct.name,
+          unitType: chosenProduct.unitType,
         };
         showcaseItems.push({
           id: chosenProduct.id,
@@ -1035,7 +1056,7 @@ export async function getCategoryShowcase(limit: number = 10): Promise<CategoryS
             const effectiveMarkup = (chosenProduct.priceMarkup ?? 1) * markup;
             const effectiveMarkupUsed = (chosenProduct.priceMarkupUsed ?? 1) * markup;
             const modPrices = calculateModificationPrices(
-              { contentAu: mod.contentAu, contentAg: mod.contentAg, contentPt: mod.contentPt, contentPd: mod.contentPd, contentAuUsed: mod.contentAuUsed, contentAgUsed: mod.contentAgUsed, contentPtUsed: mod.contentPtUsed, contentPdUsed: mod.contentPdUsed },
+              { contentAu: mod.contentAu, contentAg: mod.contentAg, contentPt: mod.contentPt, contentPd: mod.contentPd, contentTa: mod.contentTa, contentAuUsed: mod.contentAuUsed, contentAgUsed: mod.contentAgUsed, contentPtUsed: mod.contentPtUsed, contentPdUsed: mod.contentPdUsed, contentTaUsed: mod.contentTaUsed },
               metalRates,
               chosenProduct.categoryRates,
               effectiveMarkup,
@@ -1101,6 +1122,7 @@ export async function getSubcategories(parentId: string | null): Promise<Categor
       customRateAg: cat.customRateAg,
       customRatePt: cat.customRatePt,
       customRatePd: cat.customRatePd,
+      customRateTa: cat.customRateTa,
       productCount: cat._count.products,
       childrenCount: cat._count.children,
       createdAt: cat.createdAt,
@@ -1192,6 +1214,7 @@ export async function getPinnedCategories(): Promise<CategoriesResult> {
       customRateAg: cat.customRateAg,
       customRatePt: cat.customRatePt,
       customRatePd: cat.customRatePd,
+      customRateTa: cat.customRateTa,
       productCount: cat._count.products,
       createdAt: cat.createdAt,
       updatedAt: cat.updatedAt,
@@ -1220,6 +1243,7 @@ export interface UpdateCategoryRatesInput {
   customRateAg: number | null;
   customRatePt: number | null;
   customRatePd: number | null;
+  customRateTa: number | null;
 }
 
 /**
@@ -1239,6 +1263,7 @@ export async function updateCategoryRates(
             customRateAg: input.customRateAg,
             customRatePt: input.customRatePt,
             customRatePd: input.customRatePd,
+            customRateTa: input.customRateTa,
           },
         })
       )

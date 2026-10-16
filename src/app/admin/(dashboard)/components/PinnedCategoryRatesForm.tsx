@@ -20,6 +20,7 @@ interface CategoryRates {
   customRateAg: string;
   customRatePt: string;
   customRatePd: string;
+  customRateTa: string;
 }
 
 export function PinnedCategoryRatesForm({
@@ -40,6 +41,7 @@ export function PinnedCategoryRatesForm({
       customRateAg: cat.customRateAg?.toString() ?? "",
       customRatePt: cat.customRatePt?.toString() ?? "",
       customRatePd: cat.customRatePd?.toString() ?? "",
+      customRateTa: cat.customRateTa?.toString() ?? "",
     }))
   );
 
@@ -74,6 +76,7 @@ export function PinnedCategoryRatesForm({
         customRateAg: parseRate(cat.customRateAg),
         customRatePt: parseRate(cat.customRatePt),
         customRatePd: parseRate(cat.customRatePd),
+        customRateTa: parseRate(cat.customRateTa),
       }));
 
       const result = await updateCategoryRates(inputs);
@@ -226,6 +229,28 @@ export function PinnedCategoryRatesForm({
                   />
                   <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
                     ₽/мг
+                  </span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-600 mb-1">
+                  Ta (Тантал)
+                </label>
+                <div className="relative">
+                  <input
+                    type="number"
+                    step="any"
+                    min="0"
+                    value={cat.customRateTa}
+                    onChange={(e) =>
+                      handleRateChange(cat.id, "customRateTa", e.target.value)
+                    }
+                    className="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm pr-14"
+                    placeholder="—"
+                  />
+                  <span className="absolute right-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">
+                    ₽/г
                   </span>
                 </div>
               </div>

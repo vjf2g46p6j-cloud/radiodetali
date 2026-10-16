@@ -73,6 +73,7 @@ model MetalRate {
   silver    Decimal  @db.Decimal(18, 10) // Цена серебра за 1 грамм (руб)
   platinum  Decimal  @db.Decimal(18, 10) // Цена платины за 1 грамм (руб)
   palladium Decimal  @db.Decimal(18, 10) // Цена палладия за 1 грамм (руб)
+  tantalum  Decimal  @default(0) @db.Decimal(18, 10) // Цена тантала за 1 грамм (руб)
   updatedAt DateTime @updatedAt
 
   @@map("metal_rates")
@@ -131,6 +132,7 @@ model Category {
   customRateAg Float? // Курс серебра для этой категории (руб/г)
   customRatePt Float? // Курс платины для этой категории (руб/г)
   customRatePd Float? // Курс палладия для этой категории (руб/г)
+  customRateTa Float? // Курс тантала для этой категории (руб/г)
 
   // Связи для древовидной структуры
   parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
@@ -189,18 +191,21 @@ model Product {
   contentSilver    Decimal @default(0) @db.Decimal(18, 10)
   contentPlatinum  Decimal @default(0) @db.Decimal(18, 10)
   contentPalladium Decimal @default(0) @db.Decimal(18, 10)
+  contentTantalum  Decimal @default(0) @db.Decimal(18, 10) // Тантал, граммы
 
   // Содержание металлов в граммах для Б/У товаров (меньше из-за скушенных ножек и т.д.)
   contentGoldUsed      Decimal @default(0) @db.Decimal(18, 10)
   contentSilverUsed    Decimal @default(0) @db.Decimal(18, 10)
   contentPlatinumUsed  Decimal @default(0) @db.Decimal(18, 10)
   contentPalladiumUsed Decimal @default(0) @db.Decimal(18, 10)
+  contentTantalumUsed  Decimal @default(0) @db.Decimal(18, 10)
 
   // Содержание для отображения на странице товара (не влияет на цену)
   displayContentGold      Decimal @default(0) @db.Decimal(18, 10)
   displayContentSilver    Decimal @default(0) @db.Decimal(18, 10)
   displayContentPlatinum  Decimal @default(0) @db.Decimal(18, 10)
   displayContentPalladium Decimal @default(0) @db.Decimal(18, 10)
+  displayContentTantalum  Decimal @default(0) @db.Decimal(18, 10)
   // false = значения отображения синхронизируются с расчётным содержанием
   displayContentCustomized Boolean @default(false)
   // Показывать блок содержания на странице товара
@@ -250,12 +255,14 @@ model ProductModification {
   contentAg Float @default(0)
   contentPt Float @default(0)
   contentPd Float @default(0)
+  contentTa Float @default(0)
 
   // Содержание металлов для Б/У (Float, default 0)
   contentAuUsed Float @default(0)
   contentAgUsed Float @default(0)
   contentPtUsed Float @default(0)
   contentPdUsed Float @default(0)
+  contentTaUsed Float @default(0)
 
   // Связь с товаром
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)

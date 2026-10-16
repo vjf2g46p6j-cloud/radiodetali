@@ -33,6 +33,7 @@ export interface MetalRatesData {
   silver: number;
   platinum: number;
   palladium: number;
+  tantalum: number;
   updatedAt: Date;
 }
 
@@ -44,6 +45,7 @@ export interface UpdateMetalRatesInput {
   silver: number;
   platinum: number;
   palladium: number;
+  tantalum: number;
 }
 
 /**
@@ -131,6 +133,7 @@ const DEFAULT_RATES = {
   silver: 85,
   platinum: 3200,
   palladium: 3800,
+  tantalum: 0,
 };
 
 // ============================================================================
@@ -147,6 +150,7 @@ function serializeMetalRates(rates: {
   silver: unknown;
   platinum: unknown;
   palladium: unknown;
+  tantalum?: unknown;
   updatedAt: Date;
 }): MetalRatesData {
   return {
@@ -155,6 +159,7 @@ function serializeMetalRates(rates: {
     silver: Number(rates.silver),
     platinum: Number(rates.platinum),
     palladium: Number(rates.palladium),
+    tantalum: Number(rates.tantalum ?? 0),
     updatedAt: rates.updatedAt,
   };
 }
@@ -183,6 +188,7 @@ export async function getMetalRates(): Promise<MetalRatesResult> {
           silver: DEFAULT_RATES.silver,
           platinum: DEFAULT_RATES.platinum,
           palladium: DEFAULT_RATES.palladium,
+          tantalum: DEFAULT_RATES.tantalum,
         },
       });
     }
@@ -214,11 +220,13 @@ export async function updateMetalRates(
       input.gold <= 0 ||
       input.silver <= 0 ||
       input.platinum <= 0 ||
-      input.palladium <= 0
+      input.palladium <= 0 ||
+      input.tantalum < 0 ||
+      Number.isNaN(input.tantalum)
     ) {
       return {
         success: false,
-        error: "Все курсы должны быть положительными числами",
+        error: "Курсы золота, серебра, платины и палладия должны быть больше нуля",
       };
     }
 
@@ -230,6 +238,7 @@ export async function updateMetalRates(
         silver: input.silver,
         platinum: input.platinum,
         palladium: input.palladium,
+        tantalum: input.tantalum,
       },
       create: {
         id: "current",
@@ -237,6 +246,7 @@ export async function updateMetalRates(
         silver: input.silver,
         platinum: input.platinum,
         palladium: input.palladium,
+        tantalum: input.tantalum,
       },
     });
 

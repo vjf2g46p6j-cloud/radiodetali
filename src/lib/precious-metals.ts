@@ -13,6 +13,7 @@ export const PRECIOUS_METALS: Record<MetalSymbol, PreciousMetalInfo> = {
   Ag: { id: "Ag", displaySymbol: "Ag", name: "Серебро" },
   Pt: { id: "Pt", displaySymbol: "Pl", name: "Платина" },
   Pd: { id: "Pd", displaySymbol: "Pd", name: "Палладий" },
+  Ta: { id: "Ta", displaySymbol: "Ta", name: "Тантал" },
 };
 
 export const PRECIOUS_METAL_LIST: PreciousMetalInfo[] = [
@@ -20,6 +21,7 @@ export const PRECIOUS_METAL_LIST: PreciousMetalInfo[] = [
   PRECIOUS_METALS.Ag,
   PRECIOUS_METALS.Pt,
   PRECIOUS_METALS.Pd,
+  PRECIOUS_METALS.Ta,
 ];
 
 export function getMetalDisplaySymbol(metal: MetalSymbol): string {

@@ -42,6 +42,7 @@ export function ProductsTable({ products }: ProductsTableProps) {
     if (product.contentSilver > 0) metals.push(`Ag: ${formatPreciousMetalContent("Ag", product.contentSilver)}`);
     if (product.contentPlatinum > 0) metals.push(`${getMetalDisplaySymbol("Pt")}: ${formatPreciousMetalContent("Pt", product.contentPlatinum)}`);
     if (product.contentPalladium > 0) metals.push(`Pd: ${formatPreciousMetalContent("Pd", product.contentPalladium)}`);
+    if (product.contentTantalum > 0) metals.push(`Ta: ${formatPreciousMetalContent("Ta", product.contentTantalum)}`);
     return metals.length > 0 ? metals.join(", ") : "—";
   };
 
