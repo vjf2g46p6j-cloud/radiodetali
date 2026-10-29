@@ -64,9 +64,13 @@ export function isRelay(input: CatalogHint): boolean {
   return slugMatch || `${categoryName} ${productName}`.includes("реле");
 }
 
+/**
+ * Год спрашиваем только для транзисторов, микросхем, диодов и разъёмов.
+ * Реле и техническое серебро (в т.ч. «Контакты с реле 98%») год не спрашивают —
+ * так же, как на radio-klad.ru.
+ */
 export function shouldShowYearPicker(input: CatalogHint): boolean {
-  const group = classifyPrintGroup(input);
-  return group === "chips" || group === "connectors" || isRelay(input);
+  return shouldApplyYearDiscount(input);
 }
 
 /** Year overlay on price: only transistors, ICs, diodes, connectors. */
