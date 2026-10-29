@@ -17,8 +17,10 @@ import {
 import { useCartStore, type InventoryLine, type ItemCondition } from "@/store";
 import { useSiteContacts } from "../components/SiteContactsProvider";
 import { useYearPeriodDiscounts } from "../components/YearDiscountsProvider";
+import type { YearPeriodDiscounts } from "@/lib/year-discount";
 import { CalculatorModal } from "../components/CalculatorModal";
 import {
+  getDiscountPercent,
   getYearPeriodLabel,
   resolveLineDiscountPercent,
   resolveLineUnitPrice,
@@ -29,7 +31,6 @@ import {
   groupRowsForPrint,
   shouldApplyYearDiscount,
   shouldCountGoldBearingSum,
-  shouldShowYearPicker,
 } from "@/lib/inventory-print-groups";
 import { SITE_BRAND } from "@/lib/site";
 import {
@@ -69,8 +70,15 @@ function formatPrintDate(date: Date): string {
 function formatLinePeriod(
   line: InventoryLine,
   product: ProductWithPrice | null,
+  discounts: YearPeriodDiscounts,
 ): string {
-  if (!product || !shouldShowYearPicker(product)) {
+  // Год показываем только если он реально влияет на цену (скидка периода > 0):
+  // «до 1990» (0%) в описи не выводим.
+  if (
+    !product ||
+    !shouldApplyYearDiscount(product) ||
+    getDiscountPercent(discounts, line.yearPeriodId) <= 0
+  ) {
     if (
       typeof line.customDiscountPercent === "number" &&
       Number.isFinite(line.customDiscountPercent)
@@ -492,7 +500,7 @@ export function CartPageClient({ isAdmin }: { isAdmin: boolean }) {
                           )}
                         </td>
                         <td className="px-2 py-2 text-center whitespace-nowrap">
-                          {formatLinePeriod(row.line, row.product)}
+                          {formatLinePeriod(row.line, row.product, discounts)}
                         </td>
                         <td className="px-2 py-2 text-center whitespace-nowrap">
                           {getConditionLabel(
@@ -605,7 +613,7 @@ export function CartPageClient({ isAdmin }: { isAdmin: boolean }) {
                             <td className="col-num tabular-nums">{index}</td>
                             <td className="col-name">{row.displayName}</td>
                             <td className="col-year">
-                              {formatLinePeriod(row.line, row.product)}
+                              {formatLinePeriod(row.line, row.product, discounts)}
                             </td>
                             <td className="col-cond">
                               {getConditionLabel(

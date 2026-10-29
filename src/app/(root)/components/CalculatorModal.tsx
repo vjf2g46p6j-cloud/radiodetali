@@ -87,6 +87,16 @@ function formatQuantityLabel(
   }
 }
 
+/**
+ * Последний выбор состояния/года в окне «В опись». Хранится на уровне модуля,
+ * потому что для каждой карточки товара создаётся свой CalculatorModal и его
+ * state теряется при закрытии — а детали вносят пачками одного года/состояния.
+ */
+let lastChoice: {
+  condition: ItemCondition | null;
+  yearPeriodId: YearPeriodId | null;
+} = { condition: null, yearPeriodId: null };
+
 function defaultCondition(product: ProductWithPrice): ItemCondition {
   if (product.isSingleType) return "new";
   if (product.isNewAvailable) return "new";
@@ -267,8 +277,10 @@ export function CalculatorModal({
   );
 
   const open = () => {
-    setCondition(showConditionPicker ? null : defaultCondition(product));
-    setYearPeriodId(showYearPicker ? null : "until1990");
+    setCondition(
+      showConditionPicker ? lastChoice.condition : defaultCondition(product),
+    );
+    setYearPeriodId(showYearPicker ? lastChoice.yearPeriodId : "until1990");
     setCustomMarkdownEnabled(false);
     setCustomDiscountInput("");
     setQuantityInput("");
@@ -338,10 +350,17 @@ export function CalculatorModal({
     return true;
   };
 
-  const resetAfterAdd = () => {
-    setCondition(showConditionPicker ? null : defaultCondition(product));
-    // Выбранный год запоминаем: в одном окне обычно вносят много деталей одного года.
-    setYearPeriodId((prev) => (showYearPicker ? prev : "until1990"));
+  const resetAfterAdd = (
+    resolvedCondition: ItemCondition,
+    resolvedYear: YearPeriodId,
+  ) => {
+    // Состояние и год запоминаем: обычно вносят много деталей подряд с одним и тем же.
+    if (showConditionPicker) setCondition(resolvedCondition);
+    else setCondition(defaultCondition(product));
+    if (showYearPicker) setYearPeriodId(resolvedYear);
+    else setYearPeriodId("until1990");
+    if (showConditionPicker) lastChoice.condition = resolvedCondition;
+    if (showYearPicker) lastChoice.yearPeriodId = resolvedYear;
     setQuantityInput("");
     setConditionError(false);
     setYearError(false);
@@ -416,7 +435,7 @@ export function CalculatorModal({
         modificationName,
       },
     ]);
-    resetAfterAdd();
+    resetAfterAdd(resolvedCondition, resolvedYear);
   };
 
   return (
